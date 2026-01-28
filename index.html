@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>新型数学用绘图尺 - 交互式演示平台</title>
 
   <!-- Tailwind CSS -->
@@ -23,128 +23,89 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
 
   <style>
-      body {
-          font-family: 'Noto Sans SC', sans-serif;
-          background-color: #0f172a;
-          color: #e2e8f0;
-          overflow: hidden; /* Prevent body scroll, handle inside containers */
-      }
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background-color: #0f172a;
+      color: #e2e8f0;
+      overflow: hidden;
+      touch-action: none;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #1e293b; }
+    ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
 
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar {
-          width: 6px;
-          height: 6px;
-      }
-      ::-webkit-scrollbar-track {
-          background: #1e293b;
-      }
-      ::-webkit-scrollbar-thumb {
-          background: #3b82f6;
-          border-radius: 3px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-          background: #60a5fa;
-      }
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    }
+    .neon-text { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3); }
+    .btn-active {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+    }
+    .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-      .glass-panel {
-          background: rgba(30, 41, 59, 0.75);
-          backdrop-filter: blur(12px);
-          border: 1px solid rgba(148, 163, 184, 0.1);
-          box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-      }
+    #loader {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #020617; z-index: 9999;
+      display: flex; justify-content: center; align-items: center; flex-direction: column;
+      transition: opacity 0.8s ease;
+    }
+    .spinner {
+      width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.1);
+      border-radius: 50%; border-top-color: #3b82f6; animation: spin 1s ease-in-out infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-      .neon-text {
-          text-shadow: 0 0 10px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3);
-      }
+    .canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 0; }
+    .ui-layer { position: relative; z-index: 10; pointer-events: none; height: 100vh; display: flex; flex-direction: column; }
+    .interactive { pointer-events: auto; }
 
-      .btn-active {
-          background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-          color: white;
-          box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
-          border: 1px solid rgba(255,255,255,0.1);
-      }
-
-      .fade-in {
-          animation: fadeIn 0.5s ease-out forwards;
-      }
-
-      @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-      }
-
-      /* Loading Overlay */
-      #loader {
-          position: fixed;
-          top: 0; left: 0; width: 100%; height: 100%;
-          background: #020617;
-          z-index: 9999;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-direction: column;
-          transition: opacity 0.8s ease;
-      }
-      .spinner {
-          width: 50px; height: 50px;
-          border: 3px solid rgba(255,255,255,0.1);
-          border-radius: 50%;
-          border-top-color: #3b82f6;
-          animation: spin 1s ease-in-out infinite;
-      }
-      @keyframes spin {
-          to { transform: rotate(360deg); }
-      }
-
-      .canvas-container {
-          width: 100%;
-          height: 100%;
-          position: absolute;
-          top: 0;
-          left: 0;
-          z-index: 0;
-      }
-
-      .ui-layer {
-          position: relative;
-          z-index: 10;
-          pointer-events: none; /* Let clicks pass through to 3D where needed */
-          height: 100vh;
-          display: flex;
-          flex-direction: column;
-      }
-
-      .interactive {
-          pointer-events: auto;
-      }
+    /* Chat Styles */
+    .chat-bubble {
+      max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.6;
+      position: relative; word-wrap: break-word;
+    }
+    .chat-bubble.user {
+      background: #2563eb; color: white; border-bottom-right-radius: 2px; margin-left: auto;
+    }
+    .chat-bubble.ai {
+      background: #334155; color: #e2e8f0; border-bottom-left-radius: 2px; border: 1px solid rgba(255,255,255,0.05);
+    }
+    .error-bubble {
+      background: #450a0a; color: #fca5a5; border: 1px solid #991b1b;
+    }
+    .disclaimer-text {
+      font-size: 11px; color: #94a3b8; font-style: italic; margin-top: 8px;
+      padding-top: 6px; border-top: 1px dashed rgba(148, 163, 184, 0.3); display: flex; gap: 4px;
+    }
+    .typing-indicator span {
+      display: inline-block; width: 6px; height: 6px; background-color: #94a3b8;
+      border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; margin: 0 2px;
+    }
+    @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
   </style>
 </head>
 <body>
-
-<!-- Loading Screen -->
-<div id="loader">
-  <div class="spinner mb-4"></div>
-  <div class="text-blue-400 font-bold tracking-wider">加载 3D 模型...</div>
-</div>
-
-<!-- 3D Canvas Background -->
+<div id="loader"><div class="spinner mb-4"></div><div class="text-blue-400 font-bold tracking-wider">加载 3D 模型...</div></div>
 <div class="canvas-container" id="canvas-container"></div>
 
-<!-- UI Overlay -->
 <div class="ui-layer">
-
   <!-- Header -->
-  <header class="w-full glass-panel border-b border-white/10 interactive py-3 px-6 flex justify-between items-center shrink-0">
+  <header class="w-full glass-panel border-b border-white/10 interactive py-3 px-4 md:px-6 flex justify-between items-center shrink-0">
     <div class="flex items-center gap-3">
       <div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.6)]">
         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
       </div>
       <div>
-        <h1 class="text-xl font-bold text-white tracking-wide neon-text">新型数学用绘图尺</h1>
-        <p class="text-xs text-slate-400">Interactive Tool Demo</p>
+        <h1 class="text-lg md:text-xl font-bold text-white tracking-wide neon-text leading-tight">新型数学用绘图尺</h1>
+        <p class="text-xs text-slate-400 hidden md:block">Interactive Tool Demo</p>
       </div>
     </div>
-
     <nav class="hidden md:flex gap-2">
       <button onclick="switchTab('measure')" id="btn-measure" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">测量长度</button>
       <button onclick="switchTab('triangle')" id="btn-triangle" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">绘制三角形</button>
@@ -153,8 +114,8 @@
     </nav>
   </header>
 
-  <!-- Mobile Nav (Bottom) -->
-  <nav class="md:hidden flex justify-around glass-panel interactive absolute bottom-0 w-full pb-safe z-50">
+  <!-- Mobile Nav -->
+  <nav class="md:hidden flex justify-around glass-panel interactive absolute bottom-0 w-full pb-safe z-40">
     <button onclick="switchTab('measure')" class="p-3 text-xs flex flex-col items-center text-blue-400"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>测量</button>
     <button onclick="switchTab('triangle')" class="p-3 text-xs flex flex-col items-center text-slate-400"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21l1.65-3.8a9 9 0 113.95 3.95L7.5 21L3 21z"></path></svg>三角形</button>
     <button onclick="switchTab('polygon')" class="p-3 text-xs flex flex-col items-center text-slate-400"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>多边形</button>
@@ -163,27 +124,19 @@
 
   <!-- Main Content Grid -->
   <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
-
-    <!-- Left/Center: 3D Viewport Area (Invisible but for spacing) -->
     <div class="flex-1 relative pointer-events-none">
-      <!-- Floating Tooltip -->
       <div id="part-tooltip" class="absolute hidden bg-black/80 backdrop-blur border border-blue-500/50 text-white text-xs p-3 rounded pointer-events-none transform -translate-x-1/2 -translate-y-full mb-2 z-50 max-w-[200px]">
         <h4 class="font-bold text-blue-400 mb-1" id="tooltip-title">部件名称</h4>
         <p id="tooltip-desc">描述内容...</p>
       </div>
-
-      <!-- 3D Controls Overlay -->
-      <div class="absolute bottom-6 left-6 pointer-events-none">
-        <div class="text-slate-400 text-sm font-light bg-black/40 px-3 py-1 rounded backdrop-blur border border-white/5">
-          <span class="text-blue-400 font-bold">操作提示：</span> 鼠标左键旋转 · 滚轮缩放 · 右键平移 · 点击部件查看详情
+      <div id="control-hint" class="absolute bottom-6 left-6 pointer-events-none max-w-[80%]">
+        <div class="text-slate-400 text-xs md:text-sm font-light bg-black/40 px-3 py-1.5 rounded backdrop-blur border border-white/5 inline-block">
+          <span class="text-blue-400 font-bold">操作提示：</span> <span id="hint-text">加载中...</span>
         </div>
       </div>
     </div>
 
-    <!-- Right: Info/Control Panel -->
     <aside class="w-full md:w-[480px] h-1/2 md:h-full glass-panel interactive flex flex-col border-l border-white/10 transition-transform duration-500 translate-x-0" id="info-panel">
-
-      <!-- Panel Header -->
       <div class="p-4 border-b border-white/10 flex justify-between items-center bg-black/20">
         <h2 id="panel-title" class="text-lg font-bold text-white flex items-center gap-2">
           <span class="w-1 h-5 bg-blue-500 rounded-full"></span>
@@ -193,13 +146,9 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
         </button>
       </div>
-
-      <!-- Panel Content -->
       <div class="flex-1 overflow-y-auto p-5 space-y-6" id="panel-content">
-        <!-- Dynamic Content Injected Here -->
+        <!-- Dynamic Content -->
       </div>
-
-      <!-- Panel Footer -->
       <div class="p-4 border-t border-white/10 bg-black/20">
         <div class="flex gap-3 justify-center">
           <button onclick="switchTab('guide')" class="text-xs text-slate-400 hover:text-white underline decoration-dotted">使用指南</button>
@@ -211,316 +160,457 @@
   </div>
 </div>
 
+<!-- Chat Widget -->
+<div id="chat-container" class="fixed bottom-24 right-6 z-[60] w-80 md:w-96 flex flex-col transition-all duration-300 transform translate-y-[120%] opacity-0 pointer-events-none">
+  <div class="glass-panel rounded-lg overflow-hidden flex flex-col h-[500px] shadow-2xl border border-blue-500/30">
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-3 flex justify-between items-center text-white">
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+        <div class="flex flex-col">
+          <span class="font-bold text-sm">智能助手</span>
+          <span class="text-[10px] opacity-80">Public Beta</span>
+        </div>
+      </div>
+      <button onclick="toggleChat()" class="hover:text-gray-200">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <div id="chat-messages" class="flex-1 overflow-y-auto p-3 space-y-3 bg-slate-900/50">
+      <div class="chat-bubble ai">
+        您好！我是“新型数学用绘图尺”的专属 AI 助手。我已经完整学习了该产品的技术文档。您可以随意提问关于结构、功能、操作的问题。对于文档以外的通用问题，我也可以尝试为您解答。
+      </div>
+    </div>
+    <div class="p-3 bg-slate-800 border-t border-slate-700">
+      <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex gap-2">
+        <input type="text" id="chat-input" placeholder="请输入问题..." class="flex-1 bg-slate-900 text-white text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-slate-700">
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-md transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<button onclick="toggleChat()" id="chat-toggle-btn" class="fixed bottom-6 right-6 z-[60] w-14 h-14 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full shadow-lg flex items-center justify-center text-white hover:scale-110 transition-transform duration-200 border border-white/20">
+  <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+</button>
+
 <!-- JS Logic -->
 <script type="module">
   import * as THREE from 'three';
   import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-  // --- State Management ---
-  const state = {
-    currentTab: 'measure', // measure, triangle, polygon, arc, guide, faq
-    targetRotationLeft: 0, // Radians
-    targetRotationRight: 0,
-    extensionLeft: 0,     // 0 to 1
-    extensionRight: 0,
-    sliderLock: true,     // Whether sliders are locked to main rulers
-    boltVisible: true,
-    activePart: null
-  };
+  // --- 1. 移动端/平板检测 ---
+  function updateControlHints() {
+    const hintText = document.getElementById('hint-text');
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
 
-  // --- Content Data ---
-  const contentData = {
-    measure: {
-      title: "测量长度",
-      steps: [
-        { title: "短距离测量", desc: "直接使用直尺1进行测量，读取直尺上的长度标记。" },
-        { title: "长距离测量", desc: "拧下手拧螺栓4，转动两个主尺2，使其与直尺1的一侧面共线。" },
-        { title: "读数", desc: "确保主尺2与直尺1完全共线后，读取直尺1和主尺2上的长度标记，两者长度相加即为总测量长度。" }
-      ],
-      notice: "转动主尺2时，需确保其与半圆形片11的圆心位置转动顺畅，避免卡顿导致测量误差。",
-      previewType: "text"
-    },
-    triangle: {
-      title: "绘制三角形",
-      steps: [
-        { title: "调整边长", desc: "滑动副尺3调整其在主尺2上的位置。副尺3通过T型通槽31与主尺2的T型固定轴22滑动适配，调整后主尺2和副尺3的一侧边重合，确定三角形两条边的长度。" },
-        { title: "设定角度", desc: "拉动手拧螺栓4，使得两个主尺2都旋转一定的角度。通过半圆形片11上的角度标记，确定直尺1与两个主尺2之间的夹角。" },
-        { title: "绘制", desc: "待边长和夹角确定后，即可沿着直尺1、主尺2和副尺3的侧边绘制三角形。" }
-      ],
-      params: "此处展示预览区...",
-      previewType: "triangle"
-    },
-    polygon: {
-      title: "绘制多边形",
-      steps: [
-        { title: "解锁副尺", desc: "拧下手拧螺栓4，将副尺3向外伸出，使副尺3的最后端进入主尺2的转动槽23范围，此时副尺3可自由转动。" },
-        { title: "确定第一条边", desc: "使用直尺1或主尺2绘制第一条边。" },
-        { title: "确定后续边", desc: "转动主尺2确定夹角，调整副尺3长度并绘制第二条边。依次重复，最多可绘制五条边的多边形。" }
-      ],
-      notice: "每次调整主尺2角度和副尺3长度后，需确保部件连接稳定，再进行绘制，避免线条偏移。",
-      previewType: "text"
-    },
-    arc: {
-      title: "绘制弧形",
-      steps: [
-        { title: "装入笔尖", desc: "拧下手拧螺栓4，将笔尖插入其中一个副尺3的螺纹孔32中。" },
-        { title: "调整半径", desc: "滑动副尺3，调整其在主尺2缺槽21内的位置。通过限位块24与限位槽33配合固定，确定弧形半径。" },
-        { title: "旋转绘制", desc: "以半圆形片11的圆心为中心点，转动副尺3，笔尖围绕中心点移动，即可绘制出弧形。" }
-      ],
-      tips: "绘制时保持笔尖垂直于绘图平面，且转动速度均匀，确保弧形线条流畅。",
-      previewType: "arc"
-    },
-    guide: {
-      title: "使用指南",
-      content: `
-                    <div class="space-y-4">
-                        <h3 class="text-blue-400 font-bold">结构组成</h3>
-                        <ul class="list-disc list-inside text-sm space-y-2 text-slate-300">
-                            <li><span class="text-white">直尺1</span>：基础测量主体，两端固定半圆形片。</li>
-                            <li><span class="text-white">半圆形片11</span>：带有角度标记，作为旋转圆心。</li>
-                            <li><span class="text-white">主尺2</span>：转动连接在直尺两端，内部有缺槽。</li>
-                            <li><span class="text-white">副尺3</span>：滑动安装在主尺上，可伸缩和旋转。</li>
-                            <li><span class="text-white">手拧螺栓4</span>：连接副尺，用于锁定形状。</li>
-                        </ul>
-                    </div>
-                `,
-      previewType: "text"
-    },
-    faq: {
-      title: "常见问题",
-      questions: [
-        { q: "主尺转动不顺畅怎么办？", a: "检查主尺与半圆形片的连接部位是否有异物堵塞，轻轻擦拭连接点即可。" },
-        { q: "绘制弧形时半径无法固定？", a: "确保副尺的限位槽与主尺的限位块完全卡合，调整时用力到位。" },
-        { q: "手拧螺栓丢失了？", a: "可联系客服咨询配件。暂时无螺栓时，可先完成无需螺栓的功能操作。" }
-      ],
-      previewType: "accordion"
+    if (isMobile) {
+      hintText.textContent = "单指拖拽旋转 · 双指捏合缩放 · 双指拖拽平移";
+    } else {
+      hintText.textContent = "鼠标左键旋转 · 滚轮缩放 · 右键平移";
+    }
+  }
+  window.addEventListener('resize', updateControlHints);
+
+
+  // --- 2. 全量文档内容 (注入 Prompt) ---
+  const DOCUMENT_CONTEXT = `
+【说明书摘要】
+1
+本实用新型涉及绘图尺技术领域，具体公开了一种新型数学用绘图尺，
+包括：直尺，所述直尺一侧面的两端均固定安装有半圆形片；主尺，所述主
+尺的一端与半圆形片的圆心位置转动连接；副尺，所述副尺滑动安装在主尺
+的一侧面；手拧螺栓，所述手拧螺栓与两个所述副尺的另一端螺纹连接；本
+实用新型通过设置直尺、半圆形片、主尺和副尺，能够对直尺的测量长度进
+行加长，并且能够围成多种形状的三角尺和多边形尺，便于直接绘制图形，
+通过设置手拧螺栓与副尺螺纹连接，将手拧螺栓取下后，能够将笔尖插入到
+螺纹孔中围绕半圆形片的圆心绘制弧形，由于副尺在缺槽内滑动，配合限位
+块和限位槽的设置，能够控制弧形的半径，进一步提高数学用绘图尺的实用
+性。
+
+【权利要求书】
+1.一种新型数学用绘图尺，其特征在于，包括：
+直尺（1），所述直尺（1）一侧面的两端均固定安装有半圆形片（11）；
+主尺（2），所述主尺（2）的一端与半圆形片（11）的圆心位置转动连
+接；
+副尺（3），所述副尺（3）滑动安装在主尺（2）的一侧面；
+手拧螺栓（4），所述手拧螺栓（4）与两个所述副尺（3）的另一端螺纹
+连接。
+2.根据权利要求 1所述的一种新型数学用绘图尺，其特征在于：所述半圆
+形片（11）上设置有角度标记，所述直尺（1）和主尺（2）的上表面均设置
+有长度标记。
+3.根据权利要求 1所述的一种新型数学用绘图尺，其特征在于：两个所述
+主尺（2）上均开设有缺槽（21），所述缺槽（21）的一端固定安装有 T型固
+定轴（22），所述副尺（3）上开设有与 T型固定轴（22）滑动适配的 T型通
+槽（31）。
+4.根据权利要求 1所述的一种新型数学用绘图尺，其特征在于：所述缺槽
+（21）的一侧开设有转动槽（23）。
+5.根据权利要求 1所述的一种新型数学用绘图尺，其特征在于：两个所述
+副尺（3）相对的一端均开设有螺纹孔（32），所述螺纹孔（32）与手拧螺栓
+（4）螺纹连接。
+6.根据权利要求 1所述的一种新型数学用绘图尺，其特征在于：所述缺槽
+（21）的一侧面固定安装有限位块（24），所述副尺（3）朝向限位块（24）
+的一侧均匀开设有限位槽（33）。
+
+【说明书】
+【技术领域】
+本实用新型属于绘图尺技术领域，具体涉及一种新型数学用绘图尺。
+【背景技术】
+数学是学校课程中的一门主课，从小学到大学，学生始终需要学习数学；
+由于数学的学习内容包括了各种图形的计算和学习，因此，学生在学习数学
+课程和完成教师布置的数学作业时，经常需要绘制图形，为了保障所绘制图
+像的准确性，需要使用绘图辅助工具。
+绘图尺是学生文具中的重要组成部分，包括各种直尺、半圆尺和三角尺
+等，也包括各种能够辅助学生完成多种图形绘制的多功能绘图尺，例如公开
+号为 CN216033422U 的实用新型专利，公开了一种应用数学学习用组合绘图
+器，本实用新型通过设置主尺和副尺，可将副尺向主尺的一端方向进行拉动，
+主尺与副尺组合形成的伸缩式直尺，具有更长的绘图和测量距离，功能丰富，
+使用更加方便，且将副尺收缩回去，可减少占用空间，更加便携。
+上述的数学学习用组合绘图器具有测量长度和画圆弧的功能，但是这种
+绘图器不能测量角度，同时也不能直接绘制多边图形，因此，提出一种能够
+直接绘制大小不同的多边形的新型数学用绘图尺。
+【实用新型内容】
+本实用新型的目的在于提供一种新型数学用绘图尺，以解决上述背景技
+术中提出的问题。
+为实现上述目的，本实用新型提供如下技术方案：
+一种新型数学用绘图尺，包括：
+直尺，所述直尺一侧面的两端均固定安装有半圆形片；
+主尺，所述主尺的一端与半圆形片的圆心位置转动连接；
+副尺，所述副尺滑动安装在主尺的一侧面；
+手拧螺栓，所述手拧螺栓与两个所述副尺的另一端螺纹连接。
+优选的，所述半圆形片上设置有角度标记，所述直尺和主尺的上表面均
+设置有长度标记。
+优选的，两个所述主尺上均开设有缺槽，所述缺槽的一端固定安装有T型固
+定轴，所述副尺上开设有与T型固定轴滑动适配的T型通槽。
+优选的，所述缺槽的一侧开设有转动槽。
+优选的，两个所述副尺相对的一端均开设有螺纹孔，所述螺纹孔与手拧螺栓
+螺纹连接。
+优选的，所述缺槽的一侧面固定安装有限位块，所述副尺朝向限位块的
+一侧均匀开设有限位槽。
+与现有技术相比，本实用新型的有益效果是：
+（1）本实用新型通过设置直尺、半圆形片、主尺和副尺，能够对直尺的
+测量长度进行加长，并且能够围成多种形状的三角尺和多边形尺，便于直接
+绘制图形。
+（2）本实用新型通过设置手拧螺栓与副尺螺纹连接，将手拧螺栓取下
+后，能够将笔尖插入到螺纹孔中围绕半圆形片的圆心绘制弧形，由于副尺在
+缺槽内滑动，配合限位块和限位槽的设置，能够控制弧形的半径，进一步提
+高数学用绘图尺的实用性。
+【具体实施方式】
+下面将结合本实用新型实施例中的附图，对本实用新型实施例中的技术
+方案进行清楚、完整地描述，显然，所描述的实施例仅仅是本实用新型一部
+分实施例，而不是全部的实施例。基于本实用新型中的实施例，本领域普通
+技术人员在没有做出创造性劳动前提下所获得的所有其他实施例，都属于本
+实用新型保护的范围。
+实施例：
+请参阅图 1－图 6所示，一种新型数学用绘图尺，包括：
+直尺 1，直尺 1一侧面的两端均固定安装有半圆形片 11；
+主尺 2，主尺 2的一端与半圆形片 11 的圆心位置转动连接；
+副尺 3，副尺 3滑动安装在主尺 2的一侧面；
+手拧螺栓 4，手拧螺栓 4与两个副尺 3的另一端螺纹连接。
+具体的，由图 1、图 4、图 5 和图 6 可知，半圆形片 11 上设置有角度标
+记，直尺 1和主尺 2的上表面均设置有长度标记。
+由上可知，由于主尺 2 与直尺 1 转动连接，转动主尺 2时，主尺 2的一
+侧边与角度标记相对，能够显示直尺 1和主尺 2 夹角的角度，由于副尺 3 滑
+动安装在主尺 2的一侧面，并且两个副尺 3的另一端与手拧螺栓 4滑动连接，
+能够拉动手拧螺栓 4使得两个主尺 2都旋转一定的角度，形成一条边长度及
+像个夹角角度确定的三角形，而当将手拧螺栓 4拆卸掉时，能够转动主尺 2，
+使其与直尺 1的一侧面共线，增加长度测量的范围。
+具体的，由图 2和图 3可知，两个主尺 2上均开设有缺槽 21，缺槽 21 的
+一端固定安装有 T型固定轴 22，副尺 3上开设有与 T型固定轴 22 滑动适配的
+T型通槽 31。
+由上可知，由于缺槽 21、T型固定轴 22 和 T 型通槽 31 的设置，当副尺 3
+的一侧面与缺槽 21的侧面保持贴合时，副尺 3能够沿着主尺 2的长度方向直
+线移动但是不能旋转，此时主尺 2和副尺 3的一侧边重合，能够绘制不同长
+度的直线，同时，由于 T型固定轴 22 与 T 型通槽 31 滑动适配，能够避免副
+尺 3掉落。
+具体的，由图 2可知，缺槽 21 的一侧开设有转动槽 23。
+由上可知，当副尺 3向外伸出，最后端进入到转动槽 23 的范围，此时副尺
+3的侧面不与缺槽 21 的侧面贴合，副尺 3能够转动，因此，能够形成最多
+为五条边的多边形。
+具体的，由图 2和图 3可知，两个副尺 3相对的一端均开设有螺纹孔 32，
+螺纹孔 32 与手拧螺栓 4螺纹连接。
+由上可知，通过设置手拧螺栓 4与螺纹孔 32 螺纹连接，便于连接和分开
+两个副尺 3。
+具体的，由图 2和图 3可知，缺槽 21的一侧面固定安装有限位块 24，副
+尺 3朝向限位块 24的一侧均匀开设有限位槽 33。
+由上可知，由于限位块 24和限位槽 33 的设置，副尺 3在缺槽 21 内滑动
+时受到限位块 24 的阻拦，需要用力才能滑动，使得用笔带动主尺 2旋转绘制
+弧形时不易导致线条变形。
+尽管已经示出和描述了本实用新型的实施例，对于本领域的普通技术人
+员而言，可以理解在不脱离本实用新型的原理和精神的情况下可以对这些
+实施例进行多种变化、修改、替换和变型，本实用新型的范围由所附权利要
+求及其等同物限定。
+`;
+
+  // --- 3. 构建完整的 System Prompt ---
+  const SYSTEM_PROMPT = `
+        你是“新型数学用绘图尺”的专用智能助手。你已接收到该产品的完整技术文档。
+
+        【产品技术文档如下】：
+        ${DOCUMENT_CONTEXT}
+
+        【回答规则】：
+        1. 关于该产品的任何问题（如结构组成、部件名称、操作步骤、功能原理、故障处理等），必须**严格基于上述文档**进行回答。不要编造文档以外的细节。
+        2. 如果用户提出的问题是关于该产品的，请精准、简洁地回答。
+        3. 如果用户提出的问题是**文档以外的**通用问题（如天气、新闻、编程等），请利用你的通用知识回答。
+        4. 针对通用知识的回答，请在回答内容的末尾**严格添加**以下免责声明：
+           “*本回答由联网检索生成，仅供参考。我方不对该信息的准确性、完整性或时效性承担责任，由此产生的任何损失与本平台无关。*”
+        5. 如果用户问题超出你的能力范围，礼貌告知用户。
+        `;
+
+  // --- 4. API 请求 ---
+  const API_KEY = "179dec30b6784f08827f1485f26a4533.5AsXyB4K1r2kWYfF";
+
+  async function callLLMAPI(userQuery) {
+    const API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
+
+    if (!API_KEY || API_KEY.length < 10) {
+      return "未检测到有效的 API Key，已为您切换至模拟模式。";
+    }
+
+    try {
+      // 发送包含全量文档的 Prompt
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "glm-4-flash",
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            { role: "user", content: userQuery }
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API 请求失败: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (data.choices && data.choices.length > 0) {
+        return data.choices[0].message.content;
+      } else {
+        throw new Error("API 返回数据格式异常");
+      }
+
+    } catch (error) {
+      console.warn("API调用失败，自动切换到模拟模式。错误原因:", error);
+
+      // 模拟回答（包含文档知识的模拟）
+      let answer = "";
+      const q = userQuery.toLowerCase();
+      if (q.includes('尺') || q.includes('直尺') || q.includes('结构')) {
+        answer = "根据文档，本绘图尺主要由直尺1、半圆形片11、主尺2、副尺3和手拧螺栓4组成。直尺两端固定有半圆片。";
+      } else if (q.includes('测量') || q.includes('长度')) {
+        answer = "短距离用直尺1测量。长距离需拧下螺栓，将主尺与直尺共线，读取两者刻度之和。";
+      } else if (q.includes('三角')) {
+        answer = "绘制三角形：滑动副尺调整边长，拉动手拧螺栓旋转主尺确定夹角，然后沿边描边。";
+      } else if (q.includes('多边')) {
+        answer = "绘制多边形：拧下螺栓，将副尺伸出至转动槽使其可自由旋转，然后依次确定边长和夹角。";
+      } else if (q.includes('弧形') || q.includes('画弧')) {
+        answer = "绘制弧形：拧下螺栓，将笔尖插入副尺螺纹孔，调整半径（滑动副尺），以半圆片圆心为中心转动副尺。";
+      } else {
+        // 通用模拟
+        answer = `我已通过联网检索查询了关于“${userQuery}”的相关信息。根据检索到的资料，这是一个非常广泛的话题。`;
+      }
+
+      // 模拟免责声明
+      const disclaimer = "\n\n*本回答由联网检索生成，仅供参考。我方不对该信息的准确性、完整性或时效性承担责任，由此产生的任何损失与本平台无关。*";
+      return answer + disclaimer;
+    }
+  }
+
+  // --- 5. UI 交互逻辑 ---
+  window.toggleChat = function() {
+    const container = document.getElementById('chat-container');
+    const btn = document.getElementById('chat-toggle-btn');
+    if (container.classList.contains('pointer-events-none')) {
+      container.classList.remove('pointer-events-none', 'translate-y-[120%]', 'opacity-0');
+      btn.classList.add('scale-0');
+      setTimeout(() => document.getElementById('chat-input').focus(), 300);
+    } else {
+      container.classList.add('pointer-events-none', 'translate-y-[120%]', 'opacity-0');
+      btn.classList.remove('scale-0');
     }
   };
 
-  const partsInfo = {
-    "StraightRuler": { title: "直尺 1", desc: "基础测量构件，刻度标记清晰，两端连接半圆片。", color: 0x64748b },
-    "Protractor": { title: "半圆形片 11", desc: "带有角度标记，作为主尺旋转的圆心参考。", color: 0x3b82f6 },
-    "MainRuler": { title: "主尺 2", desc: "可绕半圆片圆心转动，内设缺槽供副尺滑动。", color: 0x94a3b8 },
-    "AuxRuler": { title: "副尺 3", desc: "滑动安装在主尺上，可伸长或进入转动槽自由旋转。", color: 0xf59e0b },
-    "Bolt": { title: "手拧螺栓 4", desc: "连接两个副尺的端部，用于固定整体形状。", color: 0xef4444 }
+  window.handleChatSubmit = async function(e) {
+    e.preventDefault();
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    if (!message) return;
+
+    addChatMessage(message, 'user');
+    input.value = '';
+    showTyping();
+
+    const response = await callLLMAPI(message);
+
+    removeTyping();
+
+    // 简单判断是否包含免责声明，如果有则标记为 network
+    const hasDisclaimer = response.includes("本回答由联网检索生成");
+    const isError = response.includes("联网请求失败");
+    addChatMessage(response, 'ai', hasDisclaimer, isError);
   };
 
-  // --- Three.js Setup ---
+  function addChatMessage(text, type, hasDisclaimer = false, isError = false) {
+    const container = document.getElementById('chat-messages');
+    const bubble = document.createElement('div');
+
+    if (isError) {
+      bubble.className = `chat-bubble ai error-bubble`;
+    } else {
+      bubble.className = `chat-bubble ${type}`;
+    }
+
+    if (type === 'ai') {
+      let contentHtml = '';
+      let mainText = text;
+      if (hasDisclaimer) {
+        const splitIndex = text.lastIndexOf('*');
+        if (splitIndex !== -1) {
+          mainText = text.substring(0, splitIndex);
+          const disclaimerText = text.substring(splitIndex).replace(/\*/g, '');
+          contentHtml = `
+                            <div>${mainText}</div>
+                            <div class="disclaimer-text">
+                                <svg class="w-3 h-3 text-yellow-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                <span>${disclaimerText}</span>
+                            </div>
+                        `;
+        }
+      } else {
+        contentHtml = mainText;
+      }
+
+      bubble.innerHTML = contentHtml;
+      container.appendChild(bubble);
+
+      const textDiv = bubble.firstChild;
+      textDiv.style.opacity = 0;
+      let i = 0;
+      const speed = 15;
+      function typeWriter() {
+        if (i < mainText.length) {
+          textDiv.textContent = mainText.substring(0, i + 1);
+          i++;
+          container.scrollTop = container.scrollHeight;
+          setTimeout(typeWriter, speed);
+        } else {
+          textDiv.style.opacity = 1;
+          if (bubble.children[1]) bubble.children[1].style.display = 'flex';
+        }
+      }
+      if (bubble.children[1]) bubble.children[1].style.display = 'none';
+      textDiv.textContent = '';
+      typeWriter();
+
+    } else {
+      bubble.textContent = text;
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+    }
+  }
+
+  function showTyping() {
+    const container = document.getElementById('chat-messages');
+    const id = 'typing-' + Date.now();
+    const div = document.createElement('div');
+    div.id = id;
+    div.className = 'chat-bubble ai w-fit';
+    div.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function removeTyping() {
+    const typing = document.querySelector('.typing-indicator');
+    if (typing) typing.parentElement.remove();
+  }
+
+  // --- Three.js & App Logic ---
+  const state = { currentTab: 'measure', targetRotationLeft: 0, targetRotationRight: 0, extensionLeft: 0, extensionRight: 0, boltVisible: true };
+  const contentData = {
+    measure: { title: "测量长度", steps: [{ title: "短距离测量", desc: "直接使用直尺1进行测量，读取直尺上的长度标记。" }, { title: "长距离测量", desc: "拧下手拧螺栓4，转动两个主尺2，使其与直尺1的一侧面共线。" }, { title: "读数", desc: "确保主尺2与直尺1完全共线后，读取直尺1和主尺2上的长度标记，两者长度相加即为总测量长度。" }], notice: "转动主尺2时，需确保其与半圆形片11的圆心位置转动顺畅，避免卡顿导致测量误差。", previewType: "text" },
+    triangle: { title: "绘制三角形", steps: [{ title: "调整边长", desc: "滑动副尺3调整其在主尺2上的位置。副尺3通过T型通槽31与主尺2的T型固定轴22滑动适配，调整后主尺2和副尺3的一侧边重合，确定三角形两条边的长度。" }, { title: "设定角度", desc: "拉动手拧螺栓4，使得两个主尺2都旋转一定的角度。通过半圆形片11上的角度标记，确定直尺1与两个主尺2之间的夹角。" }, { title: "绘制", desc: "待边长和夹角确定后，即可沿着直尺1、主尺2和副尺3的侧边绘制三角形。" }], previewType: "triangle" },
+    polygon: { title: "绘制多边形", steps: [{ title: "解锁副尺", desc: "拧下手拧螺栓4，将副尺3向外伸出，使副尺3的最后端进入主尺2的转动槽23范围，此时副尺3可自由转动。" }, { title: "确定第一条边", desc: "使用直尺1或主尺2绘制第一条边。" }, { title: "确定后续边", desc: "转动主尺2确定夹角，调整副尺3长度并绘制第二条边。依次重复，最多可绘制五条边的多边形。" }], notice: "每次调整主尺2角度和副尺3长度后，需确保部件连接稳定，再进行绘制，避免线条偏移。", previewType: "text" },
+    arc: { title: "绘制弧形", steps: [{ title: "装入笔尖", desc: "拧下手拧螺栓4，将笔尖插入其中一个副尺3的螺纹孔32中。" }, { title: "调整半径", desc: "滑动副尺3，调整其在主尺2缺槽21内的位置。通过限位块24与限位槽33配合固定，确定弧形半径。" }, { title: "旋转绘制", desc: "以半圆形片11的圆心为中心点，转动副尺3，笔尖围绕中心点移动，即可绘制出弧形。" }], tips: "绘制时保持笔尖垂直于绘图平面，且转动速度均匀，确保弧形线条流畅。", previewType: "arc" },
+    guide: { title: "使用指南", content: `<div class="space-y-4"><h3 class="text-blue-400 font-bold">结构组成</h3><ul class="list-disc list-inside text-sm space-y-2 text-slate-300"><li><span class="text-white">直尺1</span>：基础测量主体，两端连接半圆片。</li><li><span class="text-white">半圆形片11</span>：带有角度标记，作为旋转圆心。</li><li><span class="text-white">主尺2</span>：转动连接在直尺两端，内部有缺槽。</li><li><span class="text-white">副尺3</span>：滑动安装在主尺上，可伸缩和旋转。</li><li><span class="text-white">手拧螺栓4</span>：连接副尺，用于锁定形状。</li></ul></div>`, previewType: "text" },
+    faq: { title: "常见问题", questions: [{ q: "主尺转动不顺畅怎么办？", a: "检查主尺与半圆形片的连接部位是否有异物堵塞，轻轻擦拭连接点即可。" }, { q: "绘制弧形时半径无法固定？", a: "确保副尺的限位槽与主尺的限位块完全卡合，调整时用力到位。" }, { q: "手拧螺栓丢失了？", a: "可联系客服咨询配件。暂时无螺栓时，可先完成无需螺栓的功能操作。" }], previewType: "accordion" }
+  };
+  const partsInfo = { "StraightRuler": { title: "直尺 1", desc: "基础测量构件，刻度标记清晰，两端连接半圆片。", color: 0x64748b }, "Protractor": { title: "半圆形片 11", desc: "带有角度标记，作为主尺旋转的圆心参考。", color: 0x3b82f6 }, "MainRuler": { title: "主尺 2", desc: "可绕半圆片圆心转动，内设缺槽供副尺滑动。", color: 0x94a3b8 }, "AuxRuler": { title: "副尺 3", desc: "滑动安装在主尺上，可伸长或进入转动槽自由旋转。", color: 0xf59e0b }, "Bolt": { title: "手拧螺栓 4", desc: "连接两个副尺的端部，用于固定整体形状。", color: 0xef4444 } };
   const container = document.getElementById('canvas-container');
   const scene = new THREE.Scene();
-  // Fog for depth
   scene.fog = new THREE.FogExp2(0x0f172a, 0.02);
-
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
   camera.position.set(0, 15, 20);
-
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   container.appendChild(renderer.domElement);
-
   const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.05;
-  controls.maxPolarAngle = Math.PI / 2;
-
-  // Lighting
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-  scene.add(ambientLight);
-
+  controls.enableDamping = true; controls.dampingFactor = 0.05; controls.maxPolarAngle = Math.PI / 2;
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4); scene.add(ambientLight);
   const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-  dirLight.position.set(10, 20, 10);
-  dirLight.castShadow = true;
-  dirLight.shadow.mapSize.width = 2048;
-  dirLight.shadow.mapSize.height = 2048;
-  scene.add(dirLight);
-
-  const blueSpot = new THREE.PointLight(0x3b82f6, 0.5);
-  blueSpot.position.set(0, 10, 0);
-  scene.add(blueSpot);
-
-  // Materials
+  dirLight.position.set(10, 20, 10); dirLight.castShadow = true; dirLight.shadow.mapSize.width = 2048; dirLight.shadow.mapSize.height = 2048; scene.add(dirLight);
+  const blueSpot = new THREE.PointLight(0x3b82f6, 0.5); blueSpot.position.set(0, 10, 0); scene.add(blueSpot);
   const plasticMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.2, metalness: 0.1 });
   const rulerBaseMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.1, metalness: 0.0 });
   const accentMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, roughness: 0.2, metalness: 0.3 });
   const boltMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4, metalness: 0.5 });
-
-  // --- Ruler Construction ---
-  const rulerGroup = new THREE.Group();
-  scene.add(rulerGroup);
-
-  // 1. Straight Ruler (直尺 1)
+  const rulerGroup = new THREE.Group(); scene.add(rulerGroup);
   const rulerGeo = new THREE.BoxGeometry(12, 0.5, 1.5);
-  const ruler1 = new THREE.Mesh(rulerGeo, rulerBaseMat);
-  ruler1.castShadow = true;
-  ruler1.receiveShadow = true;
-  ruler1.userData = { type: 'StraightRuler' };
-  rulerGroup.add(ruler1);
-
-  // Add markings to Straight Ruler
-  const markingsGroup = new THREE.Group();
-  ruler1.add(markingsGroup);
-  for(let i=0; i<=24; i++) {
-    const h = (i%5===0) ? 0.6 : 0.3;
-    const mGeo = new THREE.BoxGeometry(0.05, 0.55, h);
-    const m = new THREE.Mesh(mGeo, new THREE.MeshBasicMaterial({color: 0x000000}));
-    m.position.set(-6 + i*0.5, 0, 0);
-    markingsGroup.add(m);
-  }
-
-  // 2. Protractors (半圆形片 11)
+  const ruler1 = new THREE.Mesh(rulerGeo, rulerBaseMat); ruler1.castShadow = true; ruler1.receiveShadow = true; ruler1.userData = { type: 'StraightRuler' }; rulerGroup.add(ruler1);
+  const markingsGroup = new THREE.Group(); ruler1.add(markingsGroup);
+  for(let i=0; i<=24; i++) { const h = (i%5===0) ? 0.6 : 0.3; const mGeo = new THREE.BoxGeometry(0.05, 0.55, h); const m = new THREE.Mesh(mGeo, new THREE.MeshBasicMaterial({color: 0x000000})); m.position.set(-6 + i*0.5, 0, 0); markingsGroup.add(m); }
   function createProtractor() {
     const group = new THREE.Group();
-    // Base disk
     const baseGeo = new THREE.CylinderGeometry(1.6, 1.6, 0.2, 32);
-    const base = new THREE.Mesh(baseGeo, accentMat);
-    base.rotation.x = Math.PI / 2;
-    base.position.y = 0.35; // Slightly above ruler
-    base.userData = { type: 'Protractor' };
-    group.add(base);
-
-    // Ticks (visual only)
+    const base = new THREE.Mesh(baseGeo, accentMat); base.rotation.x = Math.PI / 2; base.position.y = 0.35; base.userData = { type: 'Protractor' }; group.add(base);
     const tickGeo = new THREE.BoxGeometry(0.05, 0.2, 0.1);
-    for(let i=0; i<=180; i+=10) {
-      const tick = new THREE.Mesh(tickGeo, new THREE.MeshBasicMaterial({color: 0xffffff}));
-      tick.rotation.z = (i * Math.PI / 180);
-      tick.position.x = Math.sin(tick.rotation.z) * 1.4;
-      tick.position.y = 0.35;
-      tick.position.z = Math.cos(tick.rotation.z) * 1.4;
-      group.add(tick);
-    }
+    for(let i=0; i<=180; i+=10) { const tick = new THREE.Mesh(tickGeo, new THREE.MeshBasicMaterial({color: 0xffffff})); tick.rotation.z = (i * Math.PI / 180); tick.position.x = Math.sin(tick.rotation.z) * 1.4; tick.position.y = 0.35; tick.position.z = Math.cos(tick.rotation.z) * 1.4; group.add(tick); }
     return group;
   }
-
-  const protractorL = createProtractor();
-  protractorL.position.set(-6, 0, 0);
-  rulerGroup.add(protractorL);
-
-  const protractorR = createProtractor();
-  protractorR.position.set(6, 0, 0);
-  rulerGroup.add(protractorR);
-
-  // 3. Main Rulers (主尺 2) & 4. Aux Rulers (副尺 3)
+  const protractorL = createProtractor(); protractorL.position.set(-6, 0, 0); rulerGroup.add(protractorL);
+  const protractorR = createProtractor(); protractorR.position.set(6, 0, 0); rulerGroup.add(protractorR);
   function createArmSide(isLeft) {
-    const pivotX = isLeft ? -6 : 6;
-    const dir = isLeft ? 1 : -1; // Direction of movement
-
-    // Pivot Group
-    const pivot = new THREE.Group();
-    pivot.position.set(pivotX, 0.1, 0); // Rotates at protractor center
-    rulerGroup.add(pivot);
-
-    // Main Ruler
+    const pivotX = isLeft ? -6 : 6; const dir = isLeft ? 1 : -1;
+    const pivot = new THREE.Group(); pivot.position.set(pivotX, 0.1, 0); rulerGroup.add(pivot);
     const mainRulerGeo = new THREE.BoxGeometry(5, 0.3, 0.8);
-    const mainRuler = new THREE.Mesh(mainRulerGeo, plasticMat);
-    mainRuler.position.set(2.5 * dir, 0, 0); // Offset so pivot is at 0,0,0 of local space
-    mainRuler.userData = { type: 'MainRuler' };
-    mainRuler.castShadow = true;
-    pivot.add(mainRuler);
-
-    // Main Ruler markings
-    const mainMarks = new THREE.Group();
-    mainRuler.add(mainMarks);
-    for(let i=0; i<10; i++) {
-      const mGeo = new THREE.BoxGeometry(0.05, 0.31, 0.3);
-      const m = new THREE.Mesh(mGeo, new THREE.MeshBasicMaterial({color: 0xffffff}));
-      m.position.set(0.5 + i*0.5, 0, 0);
-      mainMarks.add(m);
-    }
-
-    // Slot (Visual representation of 缺槽)
-    const slotGeo = new THREE.BoxGeometry(3.5, 0.32, 0.3);
-    const slot = new THREE.Mesh(slotGeo, new THREE.MeshStandardMaterial({color: 0x1e293b}));
-    slot.position.set(2.5 * dir, 0.01, 0); // Slightly on top
-    mainRuler.add(slot);
-
-    // Aux Ruler
-    const auxGeo = new THREE.BoxGeometry(3, 0.28, 0.7);
-    const auxRuler = new THREE.Mesh(auxGeo, new THREE.MeshStandardMaterial({color: 0xf59e0b}));
-    auxRuler.userData = { type: 'AuxRuler' };
-    auxRuler.castShadow = true;
-
-    // Aux is child of Main for sliding, but we need to rotate it independently for "Polygon" mode later.
-    // For simplicity in this demo, Aux is child of Main initially.
-    // Initial Position: Extended a bit
-    auxRuler.position.set(1.5 * dir, 0, 0);
-    mainRuler.add(auxRuler);
-
-    // Aux markings
-    const auxMarks = new THREE.Group();
-    auxRuler.add(auxMarks);
-    for(let i=0; i<6; i++) {
-      const mGeo = new THREE.BoxGeometry(0.05, 0.29, 0.2);
-      const m = new THREE.Mesh(mGeo, new THREE.MeshBasicMaterial({color: 0x000000}));
-      m.position.set(0.5 + i*0.5, 0, 0);
-      auxMarks.add(m);
-    }
-
+    const mainRuler = new THREE.Mesh(mainRulerGeo, plasticMat); mainRuler.position.set(2.5 * dir, 0, 0); mainRuler.userData = { type: 'MainRuler' }; mainRuler.castShadow = true; pivot.add(mainRuler);
+    const mainMarks = new THREE.Group(); mainRuler.add(mainMarks);
+    for(let i=0; i<10; i++) { const mGeo = new THREE.BoxGeometry(0.05, 0.31, 0.3); const m = new THREE.Mesh(mGeo, new THREE.MeshBasicMaterial({color: 0xffffff})); m.position.set(0.5 + i*0.5, 0, 0); mainMarks.add(m); }
+    const slotGeo = new THREE.BoxGeometry(3.5, 0.32, 0.3); const slot = new THREE.Mesh(slotGeo, new THREE.MeshStandardMaterial({color: 0x1e293b})); slot.position.set(2.5 * dir, 0.01, 0); mainRuler.add(slot);
+    const auxGeo = new THREE.BoxGeometry(3, 0.28, 0.7); const auxRuler = new THREE.Mesh(auxGeo, new THREE.MeshStandardMaterial({color: 0xf59e0b})); auxRuler.userData = { type: 'AuxRuler' }; auxRuler.castShadow = true; auxRuler.position.set(1.5 * dir, 0, 0); mainRuler.add(auxRuler);
+    const auxMarks = new THREE.Group(); auxRuler.add(auxMarks);
+    for(let i=0; i<6; i++) { const mGeo = new THREE.BoxGeometry(0.05, 0.29, 0.2); const m = new THREE.Mesh(mGeo, new THREE.MeshBasicMaterial({color: 0x000000})); m.position.set(0.5 + i*0.5, 0, 0); auxMarks.add(m); }
     return { pivot, mainRuler, auxRuler };
   }
-
   const armLeft = createArmSide(true);
   const armRight = createArmSide(false);
-
-  // 5. Bolt (手拧螺栓 4)
-  const boltGroup = new THREE.Group();
-  const boltGeo = new THREE.CylinderGeometry(0.15, 0.15, 1, 16);
-  const boltMesh = new THREE.Mesh(boltGeo, boltMat);
-  boltMesh.rotation.z = Math.PI / 2;
-  boltMesh.userData = { type: 'Bolt' };
-  boltGroup.add(boltMesh);
-  // Handle of bolt
-  const handleGeo = new THREE.TorusGeometry(0.25, 0.05, 8, 16);
-  const handle = new THREE.Mesh(handleGeo, boltMat);
-  handle.position.y = 0.25;
-  boltMesh.add(handle);
-
-  // Bolt position is relative to scene, not moving with arms (conceptually it holds the tips of AuxRulers)
-  // But in this implementation, let's make it part of the scene and update its position based on AuxRuler tips
+  const boltGroup = new THREE.Group(); const boltGeo = new THREE.CylinderGeometry(0.15, 0.15, 1, 16); const boltMesh = new THREE.Mesh(boltGeo, boltMat); boltMesh.rotation.z = Math.PI / 2; boltMesh.userData = { type: 'Bolt' }; boltGroup.add(boltMesh);
+  const handleGeo = new THREE.TorusGeometry(0.25, 0.05, 8, 16); const handle = new THREE.Mesh(handleGeo, boltMat); handle.position.y = 0.25; boltMesh.add(handle);
   scene.add(boltGroup);
-
-
-  // --- Ground & Particles ---
-  const gridHelper = new THREE.GridHelper(50, 50, 0x1e293b, 0x0f172a);
-  gridHelper.position.y = -2;
-  scene.add(gridHelper);
-
-  const particleGeo = new THREE.BufferGeometry();
-  const particleCount = 200;
-  const posArray = new Float32Array(particleCount * 3);
-  for(let i=0; i<particleCount*3; i++) {
-    posArray[i] = (Math.random() - 0.5) * 30;
-  }
+  const gridHelper = new THREE.GridHelper(50, 50, 0x1e293b, 0x0f172a); gridHelper.position.y = -2; scene.add(gridHelper);
+  const particleGeo = new THREE.BufferGeometry(); const particleCount = 200; const posArray = new Float32Array(particleCount * 3);
+  for(let i=0; i<particleCount*3; i++) posArray[i] = (Math.random() - 0.5) * 30;
   particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
   const particleMat = new THREE.PointsMaterial({ size: 0.1, color: 0x3b82f6, transparent: true, opacity: 0.5 });
-  const particles = new THREE.Points(particleGeo, particleMat);
-  scene.add(particles);
-
-
-  // --- Logic & Animation ---
+  const particles = new THREE.Points(particleGeo, particleMat); scene.add(particles);
 
   function updateBoltPosition() {
-    // Calculate world position of tips of aux rulers
-    const leftTip = new THREE.Vector3(1.5, 0, 0); // Tip offset from center of aux
-    const rightTip = new THREE.Vector3(-1.5, 0, 0);
-
-    armLeft.auxRuler.localToWorld(leftTip);
-    armRight.auxRuler.localToWorld(rightTip);
-
-    // Midpoint
-    const midX = (leftTip.x + rightTip.x) / 2;
-    const midY = (leftTip.y + rightTip.y) / 2;
-    const midZ = (leftTip.z + rightTip.z) / 2;
-
-    boltGroup.position.set(midX, midY, midZ);
-
-    // Rotate bolt to align with the two tips
-    boltGroup.lookAt(leftTip);
-    boltGroup.rotateX(Math.PI/2);
+    const leftTip = new THREE.Vector3(1.5, 0, 0); const rightTip = new THREE.Vector3(-1.5, 0, 0);
+    armLeft.auxRuler.localToWorld(leftTip); armRight.auxRuler.localToWorld(rightTip);
+    const midX = (leftTip.x + rightTip.x) / 2; const midY = (leftTip.y + rightTip.y) / 2; const midZ = (leftTip.z + rightTip.z) / 2;
+    boltGroup.position.set(midX, midY, midZ); boltGroup.lookAt(leftTip); boltGroup.rotateX(Math.PI/2);
   }
-
   const tooltip = document.getElementById('part-tooltip');
   const tooltipTitle = document.getElementById('tooltip-title');
   const tooltipDesc = document.getElementById('tooltip-desc');
@@ -528,275 +618,61 @@
   const mouse = new THREE.Vector2();
 
   function onMouseClick(event) {
-    // Only process if not clicking UI
     if(event.target.closest('.interactive')) return;
-
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(scene.children, true);
-
-    if (intersects.length > 0) {
-      // Find first object with userData.type
-      const obj = intersects.find(hit => hit.object.userData.type);
-      if (obj) {
-        showTooltip(obj.object, event.clientX, event.clientY);
-        highlightPart(obj.object);
-      }
-    } else {
-      tooltip.classList.add('hidden');
-      unhighlightAll();
-    }
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1; mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera); const intersects = raycaster.intersectObjects(scene.children, true);
+    if (intersects.length > 0) { const obj = intersects.find(hit => hit.object.userData.type); if (obj) { showTooltip(obj.object, event.clientX, event.clientY); highlightPart(obj.object); } } else { tooltip.classList.add('hidden'); unhighlightAll(); }
   }
-
-  function onMouseMove(event) {
-    // Hover effect logic could go here
-  }
-
-  function showTooltip(obj, x, y) {
-    const info = partsInfo[obj.userData.type];
-    if(info) {
-      tooltipTitle.textContent = info.title;
-      tooltipDesc.textContent = info.desc;
-      tooltip.style.left = x + 'px';
-      tooltip.style.top = y + 'px';
-      tooltip.classList.remove('hidden');
-    }
-  }
-
+  function showTooltip(obj, x, y) { const info = partsInfo[obj.userData.type]; if(info) { tooltipTitle.textContent = info.title; tooltipDesc.textContent = info.desc; tooltip.style.left = x + 'px'; tooltip.style.top = y + 'px'; tooltip.classList.remove('hidden'); } }
   let currentHighlight = null;
-  function highlightPart(obj) {
-    unhighlightAll();
-    if(obj.material.emissive) {
-      obj.material.emissive.setHex(0x3b82f6);
-      obj.material.emissiveIntensity = 0.5;
-      currentHighlight = obj;
-    }
-  }
-
-  function unhighlightAll() {
-    if(currentHighlight) {
-      currentHighlight.material.emissive.setHex(0x000000);
-      currentHighlight = null;
-    }
-  }
-
+  function highlightPart(obj) { unhighlightAll(); if(obj.material.emissive) { obj.material.emissive.setHex(0x3b82f6); obj.material.emissiveIntensity = 0.5; currentHighlight = obj; } }
+  function unhighlightAll() { if(currentHighlight) { currentHighlight.material.emissive.setHex(0x000000); currentHighlight = null; } }
   window.addEventListener('click', onMouseClick);
 
-  // --- State Transitions ---
-  function lerp(start, end, amt) {
-    return (1 - amt) * start + amt * end;
-  }
-
+  function lerp(start, end, amt) { return (1 - amt) * start + amt * end; }
   function animateState() {
-    // Arm Rotations
     armLeft.pivot.rotation.z = lerp(armLeft.pivot.rotation.z, state.targetRotationLeft, 0.05);
     armRight.pivot.rotation.z = lerp(armRight.pivot.rotation.z, state.targetRotationRight, 0.05);
-
-    // Arm Extensions (Simple x-position lerp for demo)
-    // Real logic: sliding along X axis relative to MainRuler
-    const targetExtL = 0.5 + (state.extensionLeft * 2); // Min 0.5, Max 2.5
-    const targetExtR = -0.5 - (state.extensionRight * 2);
-
+    const targetExtL = 0.5 + (state.extensionLeft * 2); const targetExtR = -0.5 - (state.extensionRight * 2);
     armLeft.auxRuler.position.x = lerp(armLeft.auxRuler.position.x, targetExtL, 0.05);
     armRight.auxRuler.position.x = lerp(armRight.auxRuler.position.x, targetExtR, 0.05);
-
-    updateBoltPosition();
-    boltGroup.visible = state.boltVisible;
-
-    // Bolt rotation (spin slightly for effect)
-    if(state.boltVisible) {
-      boltMesh.rotation.y += 0.01;
-    }
+    updateBoltPosition(); boltGroup.visible = state.boltVisible;
+    if(state.boltVisible) boltMesh.rotation.y += 0.01;
   }
 
-  // --- UI Updates ---
   window.switchTab = function(tabId) {
     state.currentTab = tabId;
-
-    // Update Nav Buttons
-    document.querySelectorAll('nav button').forEach(btn => {
-      btn.classList.remove('text-white', 'bg-white/10');
-      btn.classList.add('text-slate-300');
-    });
-    const activeBtn = document.getElementById('btn-' + tabId);
-    if(activeBtn) {
-      activeBtn.classList.add('text-white', 'bg-white/10');
-      activeBtn.classList.remove('text-slate-300');
-    }
-
-    // Update Content Panel
-    const data = contentData[tabId];
-    const titleEl = document.getElementById('panel-title');
-    const contentEl = document.getElementById('panel-content');
-
-    titleEl.innerHTML = `<span class="w-1 h-5 bg-blue-500 rounded-full"></span> ${data.title}`;
-
-    let html = '';
-
-    // Render Steps
-    if (data.steps) {
-      html += `<div class="space-y-4 fade-in">`;
-      data.steps.forEach((step, idx) => {
-        html += `
-                        <div class="flex gap-3">
-                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-blue-900/50 text-blue-400 text-xs flex items-center justify-center font-bold border border-blue-800">${idx+1}</div>
-                            <div>
-                                <h4 class="text-sm font-bold text-white mb-1">${step.title}</h4>
-                                <p class="text-sm text-slate-400 leading-relaxed">${step.desc}</p>
-                            </div>
-                        </div>
-                    `;
-      });
-      html += `</div>`;
-    }
-
-    // Render Params/Preview (Simulated)
-    if (data.params) {
-      html += `
-                    <div class="mt-6 p-4 bg-slate-800/50 rounded border border-slate-700 fade-in" style="animation-delay: 0.2s">
-                        <h4 class="text-xs font-bold text-blue-400 mb-2 uppercase">参数设置预览</h4>
-                        <div class="flex gap-2 text-xs text-slate-300">
-                             <span class="px-2 py-1 bg-slate-700 rounded">角度: 45°</span>
-                             <span class="px-2 py-1 bg-slate-700 rounded">边A: 5cm</span>
-                             <span class="px-2 py-1 bg-slate-700 rounded">边B: 5cm</span>
-                        </div>
-                        <div class="mt-3 h-20 bg-slate-900 rounded flex items-center justify-center text-slate-600 text-xs border border-slate-700 dashed">
-                            [2D Drawing Preview Placeholder]
-                        </div>
-                    </div>
-                `;
-    }
-
-    // Render Accordion (FAQ)
-    if (data.questions) {
-      html += `<div class="space-y-3 fade-in">`;
-      data.questions.forEach((q, idx) => {
-        html += `
-                        <details class="group bg-slate-800/30 rounded border border-slate-700/50">
-                            <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-slate-200 hover:text-white transition">
-                                <span>${q.q}</span>
-                                <span class="transition group-open:rotate-180">
-                                    <svg fill="none" height="20" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="20"><path d="M6 9l6 6 6-6"></path></svg>
-                                </span>
-                            </summary>
-                            <div class="text-slate-400 text-xs px-3 pb-3 leading-relaxed border-t border-slate-700/50 pt-2 mt-1">
-                                ${q.a}
-                            </div>
-                        </details>
-                    `;
-      });
-      html += `</div>`;
-    }
-
-    // Render Content (Guide)
-    if (data.content) {
-      html += `<div class="fade-in">${data.content}</div>`;
-    }
-
-    // Render Notices/Tips
-    if (data.notice) {
-      html += `
-                    <div class="mt-6 p-3 bg-yellow-900/20 border border-yellow-700/50 rounded flex gap-3 fade-in" style="animation-delay: 0.3s">
-                        <svg class="w-5 h-5 text-yellow-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <div>
-                            <h5 class="text-xs font-bold text-yellow-500 mb-1">注意事项</h5>
-                            <p class="text-xs text-yellow-200/80">${data.notice}</p>
-                        </div>
-                    </div>
-                `;
-    }
-    if (data.tips) {
-      html += `
-                    <div class="mt-6 p-3 bg-blue-900/20 border border-blue-700/50 rounded flex gap-3 fade-in" style="animation-delay: 0.3s">
-                        <svg class="w-5 h-5 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        <div>
-                            <h5 class="text-xs font-bold text-blue-400 mb-1">操作技巧</h5>
-                            <p class="text-xs text-blue-200/80">${data.tips}</p>
-                        </div>
-                    </div>
-                `;
-    }
-
+    document.querySelectorAll('nav button').forEach(btn => { btn.classList.remove('text-white', 'bg-white/10'); btn.classList.add('text-slate-300'); });
+    const activeBtn = document.getElementById('btn-' + tabId); if(activeBtn) { activeBtn.classList.add('text-white', 'bg-white/10'); activeBtn.classList.remove('text-slate-300'); }
+    const data = contentData[tabId]; const titleEl = document.getElementById('panel-title'); const contentEl = document.getElementById('panel-content');
+    titleEl.innerHTML = `<span class="w-1 h-5 bg-blue-500 rounded-full"></span> ${data.title}`; let html = '';
+    if (data.steps) { html += `<div class="space-y-4 fade-in">`; data.steps.forEach((step, idx) => { html += `<div class="flex gap-3"><div class="flex-shrink-0 w-6 h-6 rounded-full bg-blue-900/50 text-blue-400 text-xs flex items-center justify-center font-bold border border-blue-800">${idx+1}</div><div><h4 class="text-sm font-bold text-white mb-1">${step.title}</h4><p class="text-sm text-slate-400 leading-relaxed">${step.desc}</p></div></div>`; }); html += `</div>`; }
+    if (data.questions) { html += `<div class="space-y-3 fade-in">`; data.questions.forEach((q, idx) => { html += `<details class="group bg-slate-800/30 rounded border border-slate-700/50"><summary class="flex justify-between items-center font-medium cursor-pointer list-none p-3 text-sm text-slate-200 hover:text-white transition"><span>${q.q}</span><span class="transition group-open:rotate-180"><svg fill="none" height="20" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="20"><path d="M6 9l6 6 6-6"></path></svg></span></summary><div class="text-slate-400 text-xs px-3 pb-3 leading-relaxed border-t border-slate-700/50 pt-2 mt-1">${q.a}</div></details>`; }); html += `</div>`; }
+    if (data.content) { html += `<div class="fade-in">${data.content}</div>`; }
+    if (data.notice) { html += `<div class="mt-6 p-3 bg-yellow-900/20 border border-yellow-700/50 rounded flex gap-3 fade-in" style="animation-delay: 0.3s"><svg class="w-5 h-5 text-yellow-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><div><h5 class="text-xs font-bold text-yellow-500 mb-1">注意事项</h5><p class="text-xs text-yellow-200/80">${data.notice}</p></div></div>`; }
     contentEl.innerHTML = html;
-
-    // --- Set 3D Model Target State ---
     switch(tabId) {
-      case 'measure':
-        state.targetRotationLeft = 0;
-        state.targetRotationRight = 0; // 0 is straight line in local, actually 0 is aligned with straight ruler
-        state.extensionLeft = 0.8;
-        state.extensionRight = 0.8;
-        state.boltVisible = false; // User unscrews it
-        break;
-      case 'triangle':
-        state.targetRotationLeft = Math.PI / 4; // 45 deg
-        state.targetRotationRight = -Math.PI / 4;
-        state.extensionLeft = 0.5;
-        state.extensionRight = 0.5;
-        state.boltVisible = true;
-        break;
-      case 'polygon':
-        state.targetRotationLeft = Math.PI / 3; // 60 deg
-        state.targetRotationRight = -Math.PI / 3;
-        state.extensionLeft = 1.0;
-        state.extensionRight = 0.2;
-        state.boltVisible = false;
-        break;
-      case 'arc':
-        state.targetRotationLeft = 0;
-        state.targetRotationRight = 0; // Straighten one side? Or use both?
-        // Let's straighten one and extend for drawing
-        state.targetRotationLeft = 0.1;
-        state.targetRotationRight = 0;
-        state.extensionLeft = 0.0; // Fully retracted
-        state.extensionRight = 0.8; // Extended for radius
-        state.boltVisible = false;
-        break;
+      case 'measure': state.targetRotationLeft = 0; state.targetRotationRight = 0; state.extensionLeft = 0.8; state.extensionRight = 0.8; state.boltVisible = false; break;
+      case 'triangle': state.targetRotationLeft = Math.PI / 4; state.targetRotationRight = -Math.PI / 4; state.extensionLeft = 0.5; state.extensionRight = 0.5; state.boltVisible = true; break;
+      case 'polygon': state.targetRotationLeft = Math.PI / 3; state.targetRotationRight = -Math.PI / 3; state.extensionLeft = 1.0; state.extensionRight = 0.2; state.boltVisible = false; break;
+      case 'arc': state.targetRotationLeft = 0.1; state.targetRotationRight = 0; state.extensionLeft = 0.0; state.extensionRight = 0.8; state.boltVisible = false; break;
     }
   };
 
-  // --- Render Loop ---
   const clock = new THREE.Clock();
-
   function animate() {
     requestAnimationFrame(animate);
     const time = clock.getElapsedTime();
-
-    controls.update();
-    animateState();
-
-    // Subtle float animation for the whole ruler
+    controls.update(); animateState();
     rulerGroup.position.y = Math.sin(time * 0.5) * 0.2 - 0.5;
-
-    // Particle movement
     particles.rotation.y = time * 0.05;
-
     renderer.render(scene, camera);
   }
-
-  // --- Resize Handler ---
-  window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
-
-  // --- Init ---
-  // Hide loader after a brief moment
+  window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); updateControlHints(); });
   window.onload = () => {
-    setTimeout(() => {
-      document.getElementById('loader').style.opacity = '0';
-      setTimeout(() => {
-        document.getElementById('loader').style.display = 'none';
-        switchTab('measure'); // Default tab
-      }, 800);
-    }, 1000);
-    animate();
+    updateControlHints();
+    setTimeout(() => { document.getElementById('loader').style.opacity = '0'; setTimeout(() => { document.getElementById('loader').style.display = 'none'; switchTab('measure'); }, 800); }, 1000); animate();
   };
-
 </script>
 </body>
-
 </html>
