@@ -96,15 +96,12 @@
 
 <div class="ui-layer">
   <!-- Header -->
-  <!-- 优化点：移动端减小 padding (px-3) -->
   <header class="w-full glass-panel border-b border-white/10 interactive py-3 px-3 md:px-6 flex justify-between items-center shrink-0 gap-2 md:gap-4">
     <div class="flex items-center gap-3 shrink-0">
-      <!-- 优化点：移动端缩小图标尺寸 -->
       <div class="w-7 h-7 md:w-8 md:h-8 rounded bg-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.6)]">
         <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
       </div>
       <div>
-        <!-- 优化点：移动端缩小字体 (text-sm)，防止挤压 -->
         <h1 class="text-sm md:text-xl font-bold text-white tracking-wide neon-text leading-tight truncate">新型数学用绘图尺</h1>
         <p class="text-[10px] md:text-xs text-slate-400 hidden md:block">Interactive Tool Demo</p>
       </div>
@@ -120,10 +117,8 @@
       </nav>
 
       <!-- Protractor Toggle Button -->
-      <!-- 优化点：移动端移除边框和左侧内边距，防止文字被切；文字只在 >=md (平板/桌面) 显示 -->
       <div class="flex items-center gap-2 md:border-l md:pl-4 md:border-white/10" title="显示/隐藏 半圆形片">
         <span class="text-xs text-slate-400 hidden md:inline">半圆片</span>
-        <!-- 优化点：shrink-0 防止按钮被压缩 -->
         <div id="protractor-toggle-btn" class="w-11 h-6 bg-blue-600 rounded-full relative cursor-pointer transition-colors duration-300 shadow-inner shrink-0">
           <div id="protractor-knob" class="w-4 h-4 bg-white rounded-full absolute top-1 right-1 transition-transform duration-300 shadow-sm pointer-events-none"></div>
         </div>
@@ -153,13 +148,18 @@
       </div>
     </div>
 
-    <aside class="w-full md:w-[480px] h-1/2 md:h-full glass-panel interactive flex flex-col border-l border-white/10 transition-transform duration-500 translate-x-0" id="info-panel">
+    <!-- 
+       修复：侧边栏恢复原有结构
+       按钮放回侧边栏头部
+    -->
+    <aside id="info-panel" class="w-full md:w-[480px] h-1/2 md:h-full glass-panel interactive flex flex-col border-l border-white/10 transition-transform duration-500 z-30">
       <div class="p-4 border-b border-white/10 flex justify-between items-center bg-black/20">
         <h2 id="panel-title" class="text-lg font-bold text-white flex items-center gap-2">
           <span class="w-1 h-5 bg-blue-500 rounded-full"></span>
           功能介绍
         </h2>
-        <button onclick="togglePanel()" class="text-slate-400 hover:text-white">
+        <!-- 恢复内部按钮 -->
+        <button onclick="togglePanel()" id="panel-toggle-btn" class="text-slate-400 hover:text-white transition-transform duration-300" title="收起/展开面板">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
         </button>
       </div>
@@ -461,6 +461,50 @@ T型通槽 31。
       btn.classList.remove('scale-0');
     }
   };
+
+  // --- 修复部分：2/3 折叠逻辑 ---
+  window.togglePanel = function() {
+    const panel = document.getElementById('info-panel');
+    const btnIcon = document.querySelector('#panel-toggle-btn svg');
+    
+    // 检查当前是否有 transform 值
+    const currentTransform = panel.style.transform;
+    const isMinimized = currentTransform && currentTransform !== 'none';
+
+    if (isMinimized) {
+      // 展开：清空 transform
+      panel.style.transform = 'none';
+      btnIcon.style.transform = 'rotate(0deg)';
+    } else {
+      // 折叠：根据屏幕宽度决定方向
+      const isMobile = window.innerWidth < 768;
+      
+      if (isMobile) {
+        // 移动端：向下折叠 2/3
+        panel.style.transform = 'translateY(66.666%)';
+      } else {
+        // 桌面端：向右折叠 2/3
+        panel.style.transform = 'translateX(66.666%)';
+      }
+      btnIcon.style.transform = 'rotate(180deg)';
+    }
+  };
+  
+  // 监听窗口大小改变，如果在折叠状态下切换横竖屏，重置折叠方向
+  window.addEventListener('resize', () => {
+     const panel = document.getElementById('info-panel');
+     const currentTransform = panel.style.transform;
+     if (currentTransform && currentTransform !== 'none') {
+       // 重新执行折叠逻辑以适应新尺寸
+       const isMobile = window.innerWidth < 768;
+       if (isMobile) {
+          panel.style.transform = 'translateY(66.666%)';
+       } else {
+          panel.style.transform = 'translateX(66.666%)';
+       }
+     }
+  });
+
 
   window.handleChatSubmit = async function(e) {
     e.preventDefault();
