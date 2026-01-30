@@ -96,18 +96,21 @@
 
 <div class="ui-layer">
   <!-- Header -->
-  <header class="w-full glass-panel border-b border-white/10 interactive py-3 px-4 md:px-6 flex justify-between items-center shrink-0 gap-4">
+  <!-- 优化点：移动端减小 padding (px-3) -->
+  <header class="w-full glass-panel border-b border-white/10 interactive py-3 px-3 md:px-6 flex justify-between items-center shrink-0 gap-2 md:gap-4">
     <div class="flex items-center gap-3 shrink-0">
-      <div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.6)]">
-        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+      <!-- 优化点：移动端缩小图标尺寸 -->
+      <div class="w-7 h-7 md:w-8 md:h-8 rounded bg-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.6)]">
+        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
       </div>
       <div>
-        <h1 class="text-lg md:text-xl font-bold text-white tracking-wide neon-text leading-tight">新型数学用绘图尺</h1>
-        <p class="text-xs text-slate-400 hidden md:block">Interactive Tool Demo</p>
+        <!-- 优化点：移动端缩小字体 (text-sm)，防止挤压 -->
+        <h1 class="text-sm md:text-xl font-bold text-white tracking-wide neon-text leading-tight truncate">新型数学用绘图尺</h1>
+        <p class="text-[10px] md:text-xs text-slate-400 hidden md:block">Interactive Tool Demo</p>
       </div>
     </div>
 
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-2 md:gap-4">
       <!-- Desktop Nav -->
       <nav class="hidden md:flex gap-2">
         <button onclick="switchTab('measure')" id="btn-measure" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">测量长度</button>
@@ -117,9 +120,11 @@
       </nav>
 
       <!-- Protractor Toggle Button -->
-      <div class="flex items-center gap-2 border-l border-white/10 pl-4" title="显示/隐藏 半圆形片">
-        <span class="text-xs text-slate-400 hidden sm:inline">半圆片</span>
-        <div id="protractor-toggle-btn" class="w-11 h-6 bg-blue-600 rounded-full relative cursor-pointer transition-colors duration-300 shadow-inner">
+      <!-- 优化点：移动端移除边框和左侧内边距，防止文字被切；文字只在 >=md (平板/桌面) 显示 -->
+      <div class="flex items-center gap-2 md:border-l md:pl-4 md:border-white/10" title="显示/隐藏 半圆形片">
+        <span class="text-xs text-slate-400 hidden md:inline">半圆片</span>
+        <!-- 优化点：shrink-0 防止按钮被压缩 -->
+        <div id="protractor-toggle-btn" class="w-11 h-6 bg-blue-600 rounded-full relative cursor-pointer transition-colors duration-300 shadow-inner shrink-0">
           <div id="protractor-knob" class="w-4 h-4 bg-white rounded-full absolute top-1 right-1 transition-transform duration-300 shadow-sm pointer-events-none"></div>
         </div>
       </div>
@@ -179,8 +184,8 @@
       <div class="flex items-center gap-2">
         <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
         <div class="flex flex-col">
-          <span class="font-bold text-sm">智能助手</span>
-<!--          <span class="text-[10px] opacity-80">全量文档注入</span>-->
+          <span class="font-bold text-sm">GLM-4.7-Flash</span>
+          <span class="text-[10px] opacity-80">全量文档注入 · 智能助手</span>
         </div>
       </div>
       <button onclick="toggleChat()" class="hover:text-gray-200">
