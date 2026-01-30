@@ -96,8 +96,8 @@
 
 <div class="ui-layer">
   <!-- Header -->
-  <header class="w-full glass-panel border-b border-white/10 interactive py-3 px-4 md:px-6 flex justify-between items-center shrink-0">
-    <div class="flex items-center gap-3">
+  <header class="w-full glass-panel border-b border-white/10 interactive py-3 px-4 md:px-6 flex justify-between items-center shrink-0 gap-4">
+    <div class="flex items-center gap-3 shrink-0">
       <div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.6)]">
         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
       </div>
@@ -106,12 +106,24 @@
         <p class="text-xs text-slate-400 hidden md:block">Interactive Tool Demo</p>
       </div>
     </div>
-    <nav class="hidden md:flex gap-2">
-      <button onclick="switchTab('measure')" id="btn-measure" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">测量长度</button>
-      <button onclick="switchTab('triangle')" id="btn-triangle" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">绘制三角形</button>
-      <button onclick="switchTab('polygon')" id="btn-polygon" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">绘制多边形</button>
-      <button onclick="switchTab('arc')" id="btn-arc" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">绘制弧形</button>
-    </nav>
+
+    <div class="flex items-center gap-4">
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex gap-2">
+        <button onclick="switchTab('measure')" id="btn-measure" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">测量长度</button>
+        <button onclick="switchTab('triangle')" id="btn-triangle" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">绘制三角形</button>
+        <button onclick="switchTab('polygon')" id="btn-polygon" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">绘制多边形</button>
+        <button onclick="switchTab('arc')" id="btn-arc" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">绘制弧形</button>
+      </nav>
+
+      <!-- Protractor Toggle Button -->
+      <div class="flex items-center gap-2 border-l border-white/10 pl-4" title="显示/隐藏 半圆形片">
+        <span class="text-xs text-slate-400 hidden sm:inline">半圆片</span>
+        <div id="protractor-toggle-btn" class="w-11 h-6 bg-blue-600 rounded-full relative cursor-pointer transition-colors duration-300 shadow-inner">
+          <div id="protractor-knob" class="w-4 h-4 bg-white rounded-full absolute top-1 right-1 transition-transform duration-300 shadow-sm pointer-events-none"></div>
+        </div>
+      </div>
+    </div>
   </header>
 
   <!-- Mobile Nav -->
@@ -167,8 +179,8 @@
       <div class="flex items-center gap-2">
         <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
         <div class="flex flex-col">
-          <span class="font-bold text-sm">GLM-4.7-Flash</span>
-          <span class="text-[10px] opacity-80">全量文档注入 · 智能助手</span>
+          <span class="font-bold text-sm">智能助手</span>
+<!--          <span class="text-[10px] opacity-80">全量文档注入</span>-->
         </div>
       </div>
       <button onclick="toggleChat()" class="hover:text-gray-200">
@@ -191,7 +203,7 @@
   </div>
 </div>
 
-<button onclick="toggleChat()" id="chat-toggle-btn" class="fixed bottom-6 right-6 z-[60] w-14 h-14 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full shadow-lg flex items-center justify-center text-white hover:scale-110 transition-transform duration-200 border border-white/20">
+<button onclick="toggleChat()" id="chat-toggle-btn" class="fixed bottom-24 right-6 md:bottom-6 z-[60] w-14 h-14 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full shadow-lg flex items-center justify-center text-white hover:scale-110 transition-transform duration-200 border border-white/20">
   <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
 </button>
 
@@ -587,6 +599,32 @@ T型通槽 31。
   }
   const protractorL = createProtractor(); protractorL.position.set(-6, 0, 0); rulerGroup.add(protractorL);
   const protractorR = createProtractor(); protractorR.position.set(6, 0, 0); rulerGroup.add(protractorR);
+
+  // 新增：半圆片显示/隐藏逻辑
+  let isProtractorVisible = true;
+  const protractorToggleBtn = document.getElementById('protractor-toggle-btn');
+  const protractorKnob = document.getElementById('protractor-knob');
+
+  protractorToggleBtn.addEventListener('click', () => {
+    isProtractorVisible = !isProtractorVisible;
+
+    // 控制 3D 对象可见性
+    protractorL.visible = isProtractorVisible;
+    protractorR.visible = isProtractorVisible;
+
+    // 更新 UI 状态
+    if (isProtractorVisible) {
+      protractorToggleBtn.classList.remove('bg-slate-600');
+      protractorToggleBtn.classList.add('bg-blue-600');
+      protractorKnob.classList.remove('-translate-x-6');
+    } else {
+      protractorToggleBtn.classList.remove('bg-blue-600');
+      protractorToggleBtn.classList.add('bg-slate-600');
+      protractorKnob.classList.add('-translate-x-6');
+    }
+  });
+
+
   function createArmSide(isLeft) {
     const pivotX = isLeft ? -6 : 6; const dir = isLeft ? 1 : -1;
     const pivot = new THREE.Group(); pivot.position.set(pivotX, 0.1, 0); rulerGroup.add(pivot);
