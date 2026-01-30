@@ -185,8 +185,8 @@
       <div class="flex items-center gap-2">
         <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
         <div class="flex flex-col">
-          <span class="font-bold text-sm">GLM-4.7-Flash</span>
-          <span class="text-[10px] opacity-80">全量文档注入 · 智能助手</span>
+          <span class="font-bold text-sm">智能助理</span>
+<!--          <span class="text-[10px] opacity-80">全量文档注入 · 智能助手</span>-->
         </div>
       </div>
       <button onclick="toggleChat()" class="hover:text-gray-200">
@@ -366,6 +366,8 @@ T型通槽 31。
 员而言，可以理解在不脱离本实用新型的原理和精神的情况下可以对这些
 实施例进行多种变化、修改、替换和变型，本实用新型的范围由所附权利要
 求及其等同物限定。
+
+客服的联系方式是zn_1018@qq.com，如果用户询问客服的联系方式，或者你认为这个问题需要联系客服，就让用户联系这个Email
 `;
 
   // --- 3. 构建完整的 System Prompt ---
@@ -477,7 +479,7 @@ T型通槽 31。
       // 展开：清空 transform
       panel.style.transform = 'none';
       btnIcon.style.transform = 'rotate(0deg)';
-      
+
       // 联动：展开面板时显示操作提示
       if(controlHint) controlHint.style.opacity = '1';
     } else {
