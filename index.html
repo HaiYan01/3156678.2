@@ -91,26 +91,17 @@
       background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(255,255,255,0.1);
       border-radius: 8px; padding: 8px; display: none; flex-direction: column; gap: 4px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100;
-      min-width: 160px; /* 确保菜单有最小宽度 */
+      min-width: 160px;
     }
     .mobile-menu-panel.show { display: flex; }
 
     /* --- 关键修复：移动端菜单按钮样式 --- */
     .mobile-menu-panel .tool-btn {
-      width: 100%; /* 宽度撑满面板 */
-      height: auto; /* 高度自适应 */
-      padding: 10px 12px; /* 增加内边距 */
-      justify-content: flex-start; /* 内容左对齐 */
-      font-size: 13px; /* 文字大小调整为13px */
-      white-space: nowrap; /* 防止文字换行 */
-      gap: 12px; /* 图标和文字之间的间距 */
+      width: 100%; height: auto; padding: 10px 12px;
+      justify-content: flex-start; font-size: 13px; white-space: nowrap; gap: 12px;
     }
-    /* 修复图标在菜单中的样式 */
     .mobile-menu-panel .tool-btn svg {
-      width: 22px; /* 图标放大到22px */
-      height: 22px; /* 图标放大到22px */
-      flex-shrink: 0; /* 防止图标被压缩 */
-      margin-right: 0; /* 清除之前的margin，用gap控制 */
+      width: 22px; height: 22px; flex-shrink: 0; margin-right: 0;
     }
 
     /* --- 关键修复：白色主题覆盖 --- */
@@ -122,13 +113,11 @@
     body.light-mode .tool-btn:hover { background: rgba(0,0,0,0.05); color: #0f172a; }
     body.light-mode .mobile-menu-panel { background: rgba(255,255,255,0.95); }
     
-    /* 文字颜色修正 */
     body.light-mode .text-white { color: #0f172a !important; }
     body.light-mode .text-slate-300 { color: #475569 !important; }
     body.light-mode .text-slate-400 { color: #64748b !important; }
     body.light-mode .neon-text { text-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
     
-    /* 其他UI细节修正 */
     body.light-mode .bg-black\/40 { background-color: rgba(255, 255, 255, 0.6) !important; border-color: rgba(0,0,0,0.05) !important; }
     body.light-mode .bg-slate-900\/50 { background-color: rgba(241, 245, 249, 0.9) !important; }
     body.light-mode .chat-bubble.ai { background: #e2e8f0; color: #1e293b; border-color: #cbd5e1; }
@@ -141,6 +130,17 @@
     body.immersive-mode #info-panel { opacity: 0; transform: translateX(100%); pointer-events: none; }
     body.immersive-mode nav.md\:hidden { opacity: 0; pointer-events: none; }
     body.immersive-mode #control-hint { opacity: 0; }
+
+    /* --- 关键修复：沉浸模式下聊天窗口层级强制置顶 --- */
+    /* 确保在全屏模式下，聊天窗口 z-index 远高于其他元素，且不被遮挡 */
+    body.immersive-mode #chat-container {
+      z-index: 99999 !important; 
+      pointer-events: auto !important;
+    }
+    /* 确保聊天窗口打开时，其内部面板可交互 */
+    #chat-container.interactive {
+      pointer-events: auto;
+    }
   </style>
 </head>
 <body>
@@ -197,9 +197,10 @@
         </div>
       </div>
 
-      <!-- 半圆片开关 -->
+      <!-- 半圆片开关 (修复：显示文字) -->
       <div class="flex items-center gap-2 md:border-l md:pl-4 md:border-white/10 shrink-0" title="显示/隐藏 半圆形片">
-        <span class="text-xs text-slate-400 hidden sm:inline">半圆片</span>
+        <!-- 移除了 hidden sm:inline，现在始终显示 -->
+        <span class="text-xs text-slate-400">半圆片</span>
         <div id="protractor-toggle-btn" class="w-11 h-6 bg-blue-600 rounded-full relative cursor-pointer transition-colors duration-300 shadow-inner shrink-0">
           <div id="protractor-knob" class="w-4 h-4 bg-white rounded-full absolute top-1 right-1 transition-transform duration-300 shadow-sm pointer-events-none"></div>
         </div>
@@ -253,8 +254,8 @@
   </div>
 </div>
 
-<!-- Chat Widget -->
-<div id="chat-container" class="fixed bottom-24 right-6 z-[60] w-80 md:w-96 flex flex-col transition-all duration-300 transform translate-y-[120%] opacity-0 pointer-events-none">
+<!-- Chat Widget (添加 interactive 类防止点击穿透) -->
+<div id="chat-container" class="fixed bottom-24 right-6 z-[60] w-80 md:w-96 flex flex-col transition-all duration-300 transform translate-y-[120%] opacity-0 pointer-events-none interactive">
   <div class="glass-panel rounded-lg overflow-hidden flex flex-col h-[500px] shadow-2xl border border-blue-500/30">
     <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-3 flex justify-between items-center text-white">
       <div class="flex items-center gap-2">
@@ -263,7 +264,8 @@
           <span class="font-bold text-sm">智能助理</span>
         </div>
       </div>
-      <button onclick="toggleChat()" class="hover:text-gray-200">
+      <!-- 修复：增大点击区域 p-2 -mr-2 -->
+      <button onclick="toggleChat()" class="hover:text-gray-200 p-2 -mr-2 transition-colors" aria-label="关闭聊天">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
       </button>
     </div>
