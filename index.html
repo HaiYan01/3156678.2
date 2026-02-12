@@ -29,6 +29,7 @@
       color: #e2e8f0;
       overflow: hidden;
       touch-action: none;
+      transition: background-color 0.3s, color 0.3s;
     }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #1e293b; }
@@ -39,6 +40,7 @@
       backdrop-filter: blur(12px);
       border: 1px solid rgba(148, 163, 184, 0.1);
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+      transition: background 0.3s, border 0.3s;
     }
     .neon-text { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3); }
     .btn-active {
@@ -70,24 +72,58 @@
       max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.6;
       position: relative; word-wrap: break-word;
     }
-    .chat-bubble.user {
-      background: #2563eb; color: white; border-bottom-right-radius: 2px; margin-left: auto;
-    }
-    .chat-bubble.ai {
-      background: #334155; color: #e2e8f0; border-bottom-left-radius: 2px; border: 1px solid rgba(255,255,255,0.05);
-    }
-    .error-bubble {
-      background: #450a0a; color: #fca5a5; border: 1px solid #991b1b;
-    }
-    .disclaimer-text {
-      font-size: 11px; color: #94a3b8; font-style: italic; margin-top: 8px;
-      padding-top: 6px; border-top: 1px dashed rgba(148, 163, 184, 0.3); display: flex; gap: 4px;
-    }
-    .typing-indicator span {
-      display: inline-block; width: 6px; height: 6px; background-color: #94a3b8;
-      border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; margin: 0 2px;
-    }
+    .chat-bubble.user { background: #2563eb; color: white; border-bottom-right-radius: 2px; margin-left: auto; }
+    .chat-bubble.ai { background: #334155; color: #e2e8f0; border-bottom-left-radius: 2px; border: 1px solid rgba(255,255,255,0.05); }
+    .disclaimer-text { font-size: 11px; color: #94a3b8; font-style: italic; margin-top: 8px; padding-top: 6px; border-top: 1px dashed rgba(148, 163, 184, 0.3); display: flex; gap: 4px; }
+    .typing-indicator span { display: inline-block; width: 6px; height: 6px; background-color: #94a3b8; border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; margin: 0 2px; }
     @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+    /* --- 新增样式：工具栏与主题 --- */
+    .tool-btn {
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      border-radius: 6px; color: #94a3b8; transition: all 0.2s; background: transparent;
+    }
+    .tool-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+    .tool-btn.active { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+    
+    .mobile-menu-panel {
+      position: absolute; top: 50px; right: 10px;
+      background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 8px; display: none; flex-direction: column; gap: 4px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100;
+    }
+    .mobile-menu-panel.show { display: flex; }
+
+    /* --- 关键修复：白色主题覆盖 --- */
+    body.light-mode { background-color: #f1f5f9; color: #1e293b; }
+    body.light-mode .glass-panel { background: rgba(255, 255, 255, 0.85); border-color: rgba(0,0,0,0.05); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
+    body.light-mode header { border-color: rgba(0,0,0,0.05); }
+    body.light-mode aside { border-color: rgba(0,0,0,0.05); }
+    body.light-mode .tool-btn { color: #64748b; }
+    body.light-mode .tool-btn:hover { background: rgba(0,0,0,0.05); color: #0f172a; }
+    body.light-mode .mobile-menu-panel { background: rgba(255,255,255,0.95); }
+    
+    /* 文字颜色修正 */
+    body.light-mode .text-white { color: #0f172a !important; } /* 强制将白色文字改为深色 */
+    body.light-mode .text-slate-300 { color: #475569 !important; }
+    body.light-mode .text-slate-400 { color: #64748b !important; }
+    body.light-mode .neon-text { text-shadow: 0 0 10px rgba(59, 130, 246, 0.2); } /* 减少发光强度 */
+    
+    /* 其他UI细节修正 */
+    body.light-mode .bg-black\/40 { background-color: rgba(255, 255, 255, 0.6) !important; border-color: rgba(0,0,0,0.05) !important; }
+    body.light-mode .bg-slate-900\/50 { background-color: rgba(241, 245, 249, 0.9) !important; }
+    body.light-mode .chat-bubble.ai { background: #e2e8f0; color: #1e293b; border-color: #cbd5e1; }
+    body.light-mode input { background: #e2e8f0 !important; color: #1e293b !important; border-color: #cbd5e1 !important; }
+    body.light-mode #panel-content h4 { color: #0f172a !important; } /* 步骤标题 */
+    body.light-mode .bg-blue-900\/50 { background-color: rgba(219, 234, 254, 0.5) !important; color: #1e40af !important; }
+    body.light-mode .border-blue-800 { border-color: rgba(59, 130, 246, 0.3) !important; }
+
+    /* --- 沉浸模式（全屏）优化 --- */
+    /* 全屏时隐藏：右侧面板、底部移动导航、控制提示 */
+    body.immersive-mode #info-panel { opacity: 0; transform: translateX(100%); pointer-events: none; }
+    body.immersive-mode nav.md\:hidden { opacity: 0; pointer-events: none; } /* 隐藏底部移动导航 */
+    body.immersive-mode #control-hint { opacity: 0; }
+    /* 全屏时保留：Header 和 AI 助理按钮默认可见，无需额外CSS，因为它们不在隐藏列表中 */
   </style>
 </head>
 <body>
@@ -95,7 +131,7 @@
 <div class="canvas-container" id="canvas-container"></div>
 
 <div class="ui-layer">
-  <!-- Header -->
+  <!-- Header (全屏时保留) -->
   <header class="w-full glass-panel border-b border-white/10 interactive py-3 px-3 md:px-6 flex justify-between items-center shrink-0 gap-2 md:gap-4">
     <div class="flex items-center gap-3 shrink-0">
       <div class="w-7 h-7 md:w-8 md:h-8 rounded bg-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.6)]">
@@ -107,19 +143,44 @@
       </div>
     </div>
 
-    <div class="flex items-center gap-2 md:gap-4">
-      <!-- Desktop Nav -->
-      <nav class="hidden md:flex gap-2">
-        <button onclick="switchTab('measure')" id="btn-measure" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">测量长度</button>
-        <button onclick="switchTab('triangle')" id="btn-triangle" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">绘制三角形</button>
-        <button onclick="switchTab('polygon')" id="btn-polygon" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">绘制多边形</button>
-        <button onclick="switchTab('arc')" id="btn-arc" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">绘制弧形</button>
-      </nav>
+    <!-- 中间导航(桌面) -->
+    <nav class="hidden md:flex gap-2">
+      <button onclick="switchTab('measure')" id="btn-measure" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">测量长度</button>
+      <button onclick="switchTab('triangle')" id="btn-triangle" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">绘制三角形</button>
+      <button onclick="switchTab('polygon')" id="btn-polygon" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">绘制多边形</button>
+      <button onclick="switchTab('arc')" id="btn-arc" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">绘制弧形</button>
+    </nav>
 
-      <!-- Protractor Toggle Button -->
+    <!-- 右侧工具区 -->
+    <div class="flex items-center gap-1 md:gap-2 relative">
+      
+      <!-- 桌面端工具栏 -->
+      <div class="hidden md:flex items-center gap-1 border-l pl-2 border-white/10">
+        <button onclick="toggleGrid()" id="btn-grid" class="tool-btn active" title="网格开关"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg></button>
+        <button onclick="resetView()" class="tool-btn" title="重置视角"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg></button>
+        <button onclick="toggleTheme()" id="btn-theme" class="tool-btn" title="切换主题"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></button>
+        <button onclick="toggleFullscreen()" class="tool-btn" title="沉浸模式"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></button>
+        <button onclick="takeScreenshot()" class="tool-btn" title="截图"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
+      </div>
+
+      <!-- 手机端工具菜单按钮 -->
+      <div class="flex md:hidden items-center">
+        <button onclick="toggleMobileMenu()" id="mobile-menu-btn" class="tool-btn" title="更多工具">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+        </button>
+        <!-- 手机端弹出菜单 -->
+        <div id="mobile-menu-panel" class="mobile-menu-panel">
+            <button onclick="toggleGrid(); toggleMobileMenu()" class="tool-btn w-full justify-start"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"></path></svg>网格开关</button>
+            <button onclick="resetView(); toggleMobileMenu()" class="tool-btn w-full justify-start"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>重置视角</button>
+            <button onclick="toggleTheme(); toggleMobileMenu()" class="tool-btn w-full justify-start"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>切换主题</button>
+            <button onclick="toggleFullscreen(); toggleMobileMenu()" class="tool-btn w-full justify-start"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>沉浸模式</button>
+            <button onclick="takeScreenshot(); toggleMobileMenu()" class="tool-btn w-full justify-start"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>截图保存</button>
+        </div>
+      </div>
+
+      <!-- 半圆片开关 -->
       <div class="flex items-center gap-2 md:border-l md:pl-4 md:border-white/10" title="显示/隐藏 半圆形片">
-        <!-- 修复：移除 hidden md:inline，改为 text-xs text-slate-400，确保手机上也能看到文字 -->
-        <span class="text-xs text-slate-400">半圆片</span>
+        <span class="text-xs text-slate-400 hidden sm:inline">半圆片</span>
         <div id="protractor-toggle-btn" class="w-11 h-6 bg-blue-600 rounded-full relative cursor-pointer transition-colors duration-300 shadow-inner shrink-0">
           <div id="protractor-knob" class="w-4 h-4 bg-white rounded-full absolute top-1 right-1 transition-transform duration-300 shadow-sm pointer-events-none"></div>
         </div>
@@ -127,9 +188,8 @@
     </div>
   </header>
 
-  <!-- Mobile Nav -->
+  <!-- Mobile Nav (全屏时隐藏) -->
   <nav class="md:hidden flex justify-around glass-panel interactive absolute bottom-0 w-full pb-safe z-40">
-    <!-- 修复：给按钮添加 ID，确保 switchTab 函数在手机端也能正确高亮按钮 -->
     <button id="btn-measure-mobile" onclick="switchTab('measure')" class="p-3 text-xs flex flex-col items-center text-blue-400"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>测量</button>
     <button id="btn-triangle-mobile" onclick="switchTab('triangle')" class="p-3 text-xs flex flex-col items-center text-slate-400"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21l1.65-3.8a9 9 0 113.95 3.95L7.5 21L3 21z"></path></svg>三角形</button>
     <button id="btn-polygon-mobile" onclick="switchTab('polygon')" class="p-3 text-xs flex flex-col items-center text-slate-400"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>多边形</button>
@@ -143,7 +203,6 @@
         <h4 class="font-bold text-blue-400 mb-1" id="tooltip-title">部件名称</h4>
         <p id="tooltip-desc">描述内容...</p>
       </div>
-      <!-- 添加了 transition 以实现平滑显示/隐藏 -->
       <div id="control-hint" class="absolute bottom-6 left-6 pointer-events-none max-w-[80%] transition-opacity duration-500 opacity-100">
         <div class="text-slate-400 text-xs md:text-sm font-light bg-black/40 px-3 py-1.5 rounded backdrop-blur border border-white/5 inline-block">
           <span class="text-blue-400 font-bold">操作提示：</span> <span id="hint-text">加载中...</span>
@@ -151,17 +210,12 @@
       </div>
     </div>
 
-    <!--
-       侧边栏结构
-       按钮在侧边栏头部
-    -->
     <aside id="info-panel" class="w-full md:w-[480px] h-1/2 md:h-full glass-panel interactive flex flex-col border-l border-white/10 transition-transform duration-500 z-30">
       <div class="p-4 border-b border-white/10 flex justify-between items-center bg-black/20">
         <h2 id="panel-title" class="text-lg font-bold text-white flex items-center gap-2">
           <span class="w-1 h-5 bg-blue-500 rounded-full"></span>
           功能介绍
         </h2>
-        <!-- 收起/展开按钮 -->
         <button onclick="togglePanel()" id="panel-toggle-btn" class="text-slate-400 hover:text-white transition-transform duration-300" title="收起/展开面板">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
         </button>
@@ -169,7 +223,6 @@
       <div class="flex-1 overflow-y-auto p-5 space-y-6" id="panel-content">
         <!-- Dynamic Content -->
       </div>
-      <!-- 修复：增加 pb-20 (底部内边距 5rem)，让按钮上移，避免被底部导航栏遮挡 -->
       <div class="p-4 pb-20 border-t border-white/10 bg-black/20">
         <div class="flex gap-3 justify-center">
           <button onclick="switchTab('guide')" class="text-xs text-slate-400 hover:text-white underline decoration-dotted">使用指南</button>
@@ -189,7 +242,6 @@
         <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
         <div class="flex flex-col">
           <span class="font-bold text-sm">智能助理</span>
-<!--          <span class="text-[10px] opacity-80">全量文档注入 · 智能助手</span>-->
         </div>
       </div>
       <button onclick="toggleChat()" class="hover:text-gray-200">
@@ -225,7 +277,6 @@
   function updateControlHints() {
     const hintText = document.getElementById('hint-text');
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
-
     if (isMobile) {
       hintText.textContent = "单指拖拽旋转 · 双指捏合缩放 · 双指拖拽平移";
     } else {
@@ -233,7 +284,6 @@
     }
   }
   window.addEventListener('resize', updateControlHints);
-
 
   // --- 2. 全量文档内容 (注入 Prompt) ---
   const DOCUMENT_CONTEXT = `
@@ -337,7 +387,7 @@
 副尺 3，副尺 3滑动安装在主尺 2的一侧面；
 手拧螺栓 4，手拧螺栓 4与两个副尺 3的另一端螺纹连接。
 具体的，由图 1、图 4、图 5 和图 6 可知，半圆形片 11 上设置有角度标
-记，直尺 1和主尺 2的上表面均设置有长度标记。
+记，直尺 1和主尺 2的上表面均设置有有长度标记。
 由上可知，由于主尺 2 与直尺 1 转动连接，转动主尺 2时，主尺 2的一
 侧边与角度标记相对，能够显示直尺 1和主尺 2 夹角的角度，由于副尺 3 滑
 动安装在主尺 2的一侧面，并且两个副尺 3的另一端与手拧螺栓 4滑动连接，
@@ -394,19 +444,11 @@ T型通槽 31。
 
   async function callLLMAPI(userQuery) {
     const API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
-
-    if (!API_KEY || API_KEY.length < 10) {
-      return "未检测到有效的 API Key，已为您切换至模拟模式。";
-    }
-
+    if (!API_KEY || API_KEY.length < 10) return "未检测到有效的 API Key。";
     try {
-      // 发送包含全量文档的 Prompt
       const response = await fetch(API_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${API_KEY}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
         body: JSON.stringify({
           model: "glm-4-flash",
           messages: [
@@ -415,42 +457,12 @@ T型通槽 31。
           ]
         })
       });
-
-      if (!response.ok) {
-        throw new Error(`API 请求失败: ${response.status} ${response.statusText}`);
-      }
-
+      if (!response.ok) throw new Error(`API Error: ${response.status}`);
       const data = await response.json();
-      if (data.choices && data.choices.length > 0) {
-        return data.choices[0].message.content;
-      } else {
-        throw new Error("API 返回数据格式异常");
-      }
-
+      return data.choices[0].message.content;
     } catch (error) {
-      console.warn("API调用失败，自动切换到模拟模式。错误原因:", error);
-
-      // 模拟回答（包含文档知识的模拟）
-      let answer = "";
-      const q = userQuery.toLowerCase();
-      if (q.includes('尺') || q.includes('直尺') || q.includes('结构')) {
-        answer = "根据文档，本绘图尺主要由直尺1、半圆形片11、主尺2、副尺3和手拧螺栓4组成。直尺两端固定有半圆片。";
-      } else if (q.includes('测量') || q.includes('长度')) {
-        answer = "短距离用直尺1测量。长距离需拧下螺栓，将主尺与直尺共线，读取两者刻度之和。";
-      } else if (q.includes('三角')) {
-        answer = "绘制三角形：滑动副尺调整边长，拉动手拧螺栓旋转主尺确定夹角，然后沿边描边。";
-      } else if (q.includes('多边')) {
-        answer = "绘制多边形：拧下螺栓，将副尺伸出至转动槽使其可自由旋转，然后依次确定边长和夹角。";
-      } else if (q.includes('弧形') || q.includes('画弧')) {
-        answer = "绘制弧形：拧下螺栓，将笔尖插入副尺螺纹孔，调整半径（滑动副尺），以半圆片圆心为中心转动副尺。";
-      } else {
-        // 通用模拟
-        answer = `我已通过联网检索查询了关于“${userQuery}”的相关信息。根据检索到的资料，这是一个非常广泛的话题。`;
-      }
-
-      // 模拟免责声明
-      const disclaimer = "\n\n*本回答由联网检索生成，仅供参考。我方不对该信息的准确性、完整性或时效性承担责任，由此产生的任何损失与本平台无关。*";
-      return answer + disclaimer;
+      console.warn("API Error:", error);
+      return "网络请求失败，请稍后重试。";
     }
   }
 
@@ -468,138 +480,183 @@ T型通槽 31。
     }
   };
 
-  // --- 修复部分：统一改为向下收起，并联动隐藏操作提示 ---
   window.togglePanel = function() {
     const panel = document.getElementById('info-panel');
     const btnIcon = document.querySelector('#panel-toggle-btn svg');
-    const controlHint = document.getElementById('control-hint'); // 获取操作提示元素
-
-    // 检查当前是否有 transform 值
-    const currentTransform = panel.style.transform;
-    const isMinimized = currentTransform && currentTransform !== 'none';
-
+    const controlHint = document.getElementById('control-hint');
+    const isMinimized = panel.style.transform && panel.style.transform !== 'none';
     if (isMinimized) {
-      // 展开：清空 transform
       panel.style.transform = 'none';
       btnIcon.style.transform = 'rotate(0deg)';
-
-      // 联动：展开面板时显示操作提示
       if(controlHint) controlHint.style.opacity = '1';
     } else {
-      // 收起：统一改为向下收起 (2/3 隐藏，1/3 显示)
       panel.style.transform = 'translateY(66.666%)';
       btnIcon.style.transform = 'rotate(180deg)';
-
-      // 联动：收起面板时隐藏操作提示
       if(controlHint) controlHint.style.opacity = '0';
     }
   };
-
-  // 监听窗口大小改变，如果在折叠状态下切换横竖屏，保持向下收起
-  window.addEventListener('resize', () => {
-    const panel = document.getElementById('info-panel');
-    const currentTransform = panel.style.transform;
-    if (currentTransform && currentTransform !== 'none') {
-      // 保持向下收起的状态
-      panel.style.transform = 'translateY(66.666%)';
-    }
-  });
-
 
   window.handleChatSubmit = async function(e) {
     e.preventDefault();
     const input = document.getElementById('chat-input');
     const message = input.value.trim();
     if (!message) return;
-
     addChatMessage(message, 'user');
     input.value = '';
     showTyping();
-
     const response = await callLLMAPI(message);
-
     removeTyping();
-
-    // 简单判断是否包含免责声明，如果有则标记为 network
     const hasDisclaimer = response.includes("本回答由联网检索生成");
-    const isError = response.includes("联网请求失败");
-    addChatMessage(response, 'ai', hasDisclaimer, isError);
+    addChatMessage(response, 'ai', hasDisclaimer);
   };
 
-  function addChatMessage(text, type, hasDisclaimer = false, isError = false) {
+  function addChatMessage(text, type, hasDisclaimer = false) {
     const container = document.getElementById('chat-messages');
     const bubble = document.createElement('div');
-
-    if (isError) {
-      bubble.className = `chat-bubble ai error-bubble`;
-    } else {
-      bubble.className = `chat-bubble ${type}`;
-    }
-
+    bubble.className = `chat-bubble ${type}`;
+    
+    // Simple text rendering for brevity in this update
     if (type === 'ai') {
-      let contentHtml = '';
-      let mainText = text;
-      if (hasDisclaimer) {
-        const splitIndex = text.lastIndexOf('*');
-        if (splitIndex !== -1) {
-          mainText = text.substring(0, splitIndex);
-          const disclaimerText = text.substring(splitIndex).replace(/\*/g, '');
-          contentHtml = `
-                            <div>${mainText}</div>
-                            <div class="disclaimer-text">
-                                <svg class="w-3 h-3 text-yellow-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                                <span>${disclaimerText}</span>
-                            </div>
-                        `;
+        let html = text;
+        if(hasDisclaimer) {
+            // Handle disclaimer formatting
+            const parts = text.split('*');
+            html = parts[0] + `<div class="disclaimer-text"><span>${parts[1] || ''}</span></div>`;
         }
-      } else {
-        contentHtml = mainText;
-      }
-
-      bubble.innerHTML = contentHtml;
-      container.appendChild(bubble);
-
-      const textDiv = bubble.firstChild;
-      textDiv.style.opacity = 0;
-      let i = 0;
-      const speed = 15;
-      function typeWriter() {
-        if (i < mainText.length) {
-          textDiv.textContent = mainText.substring(0, i + 1);
-          i++;
-          container.scrollTop = container.scrollHeight;
-          setTimeout(typeWriter, speed);
-        } else {
-          textDiv.style.opacity = 1;
-          if (bubble.children[1]) bubble.children[1].style.display = 'flex';
-        }
-      }
-      if (bubble.children[1]) bubble.children[1].style.display = 'none';
-      textDiv.textContent = '';
-      typeWriter();
-
+        bubble.innerHTML = html;
     } else {
-      bubble.textContent = text;
-      container.appendChild(bubble);
-      container.scrollTop = container.scrollHeight;
+        bubble.textContent = text;
     }
+    
+    container.appendChild(bubble);
+    container.scrollTop = container.scrollHeight;
   }
 
   function showTyping() {
     const container = document.getElementById('chat-messages');
-    const id = 'typing-' + Date.now();
     const div = document.createElement('div');
-    div.id = id;
     div.className = 'chat-bubble ai w-fit';
+    div.id = 'typing-indicator';
     div.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
   }
 
   function removeTyping() {
-    const typing = document.querySelector('.typing-indicator');
-    if (typing) typing.parentElement.remove();
+    const typing = document.getElementById('typing-indicator');
+    if (typing) typing.remove();
   }
+
+  // --- 6. 新增工具函数 ---
+  
+  // 移动端菜单切换
+  window.toggleMobileMenu = function() {
+    const panel = document.getElementById('mobile-menu-panel');
+    panel.classList.toggle('show');
+  };
+
+  // 网格开关
+  window.toggleGrid = function() {
+    if (!window.gridHelper) return;
+    window.gridHelper.visible = !window.gridHelper.visible;
+    const btn = document.getElementById('btn-grid');
+    if(btn) btn.classList.toggle('active', window.gridHelper.visible);
+  };
+
+  // 重置视角
+  window.resetView = function() {
+    if (!window.controls) return;
+    const targetPos = { x: 0, y: 15, z: 20 };
+    const startPos = { x: camera.position.x, y: camera.position.y, z: camera.position.z };
+    const startTime = Date.now();
+    const duration = 800;
+
+    function animateReset() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const t = 1 - Math.pow(1 - progress, 3);
+
+        camera.position.x = startPos.x + (targetPos.x - startPos.x) * t;
+        camera.position.y = startPos.y + (targetPos.y - startPos.y) * t;
+        camera.position.z = startPos.z + (targetPos.z - startPos.z) * t;
+        
+        window.controls.target.set(0, 0, 0); 
+        window.controls.update();
+
+        if (progress < 1) requestAnimationFrame(animateReset);
+    }
+    animateReset();
+  };
+
+  // 主题切换
+  window.toggleTheme = function() {
+    const body = document.body;
+    const isDark = !body.classList.contains('light-mode');
+    
+    if (isDark) {
+        body.classList.add('light-mode');
+        scene.background = new THREE.Color(0xf1f5f9); 
+        scene.fog.color = new THREE.Color(0xf1f5f9);
+    } else {
+        body.classList.remove('light-mode');
+        scene.background = new THREE.Color(0x0f172a); 
+        scene.fog.color = new THREE.Color(0x0f172a);
+    }
+    const btn = document.getElementById('btn-theme');
+    if(btn) btn.classList.toggle('active', isDark); 
+  };
+
+  // 沉浸模式
+  window.toggleFullscreen = function() {
+    const docEl = document.documentElement;
+    const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+
+    if (!isFullscreen) {
+        if (docEl.requestFullscreen) docEl.requestFullscreen();
+        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+        document.body.classList.add('immersive-mode');
+    } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        document.body.classList.remove('immersive-mode');
+    }
+  };
+
+  document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) document.body.classList.remove('immersive-mode');
+  });
+
+  // 截图功能 - 最终修复版
+  window.takeScreenshot = function() {
+    if(!window.renderer) return;
+    
+    // 渲染当前帧
+    renderer.render(scene, camera);
+
+    // 使用 toBlob 兼容性最好
+    renderer.domElement.toBlob((blob) => {
+      if (!blob) {
+        console.error("截图失败：无法生成图片数据");
+        return;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `绘图尺截图_${new Date().getTime()}.png`;
+      
+      // 关键修复：必须将链接加入 DOM 才能触发点击下载
+      document.body.appendChild(a);
+      a.click();
+      
+      // 延迟释放资源
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 0);
+    }, 'image/png');
+  };
+
 
   // --- Three.js & App Logic ---
   const state = { currentTab: 'measure', targetRotationLeft: 0, targetRotationRight: 0, extensionLeft: 0, extensionRight: 0, boltVisible: true };
@@ -612,32 +669,43 @@ T型通槽 31。
     faq: { title: "常见问题", questions: [{ q: "主尺转动不顺畅怎么办？", a: "检查主尺与半圆形片的连接部位是否有异物堵塞，轻轻擦拭连接点即可。" }, { q: "绘制弧形时半径无法固定？", a: "确保副尺的限位槽与主尺的限位块完全卡合，调整时用力到位。" }, { q: "手拧螺栓丢失了？", a: "可联系客服咨询配件。暂时无螺栓时，可先完成无需螺栓的功能操作。" }], previewType: "accordion" }
   };
   const partsInfo = { "StraightRuler": { title: "直尺 1", desc: "基础测量构件，刻度标记清晰，两端连接半圆片。", color: 0x64748b }, "Protractor": { title: "半圆形片 11", desc: "带有角度标记，作为主尺旋转的圆心参考。", color: 0x3b82f6 }, "MainRuler": { title: "主尺 2", desc: "可绕半圆片圆心转动，内设缺槽供副尺滑动。", color: 0x94a3b8 }, "AuxRuler": { title: "副尺 3", desc: "滑动安装在主尺上，可伸长或进入转动槽自由旋转。", color: 0xf59e0b }, "Bolt": { title: "手拧螺栓 4", desc: "连接两个副尺的端部，用于固定整体形状。", color: 0xef4444 } };
+  
   const container = document.getElementById('canvas-container');
   const scene = new THREE.Scene();
   scene.fog = new THREE.FogExp2(0x0f172a, 0.02);
+  
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
   camera.position.set(0, 15, 20);
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  
+  // 关键：开启 preserveDrawingBuffer 以支持截图
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   container.appendChild(renderer.domElement);
+  
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true; controls.dampingFactor = 0.05; controls.maxPolarAngle = Math.PI / 2;
+  window.controls = controls; // 暴露给全局工具函数
+  window.renderer = renderer; // 暴露给全局工具函数（截图需要）
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.4); scene.add(ambientLight);
   const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
   dirLight.position.set(10, 20, 10); dirLight.castShadow = true; dirLight.shadow.mapSize.width = 2048; dirLight.shadow.mapSize.height = 2048; scene.add(dirLight);
   const blueSpot = new THREE.PointLight(0x3b82f6, 0.5); blueSpot.position.set(0, 10, 0); scene.add(blueSpot);
+  
   const plasticMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.2, metalness: 0.1 });
   const rulerBaseMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.1, metalness: 0.0 });
   const accentMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, roughness: 0.2, metalness: 0.3 });
   const boltMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4, metalness: 0.5 });
+  
   const rulerGroup = new THREE.Group(); scene.add(rulerGroup);
   const rulerGeo = new THREE.BoxGeometry(12, 0.5, 1.5);
   const ruler1 = new THREE.Mesh(rulerGeo, rulerBaseMat); ruler1.castShadow = true; ruler1.receiveShadow = true; ruler1.userData = { type: 'StraightRuler' }; rulerGroup.add(ruler1);
+  
   const markingsGroup = new THREE.Group(); ruler1.add(markingsGroup);
   for(let i=0; i<=24; i++) { const h = (i%5===0) ? 0.6 : 0.3; const mGeo = new THREE.BoxGeometry(0.05, 0.55, h); const m = new THREE.Mesh(mGeo, new THREE.MeshBasicMaterial({color: 0x000000})); m.position.set(-6 + i*0.5, 0, 0); markingsGroup.add(m); }
+  
   function createProtractor() {
     const group = new THREE.Group();
     const baseGeo = new THREE.CylinderGeometry(1.6, 1.6, 0.2, 32);
@@ -649,30 +717,21 @@ T型通槽 31。
   const protractorL = createProtractor(); protractorL.position.set(-6, 0, 0); rulerGroup.add(protractorL);
   const protractorR = createProtractor(); protractorR.position.set(6, 0, 0); rulerGroup.add(protractorR);
 
-  // 新增：半圆片显示/隐藏逻辑
   let isProtractorVisible = true;
   const protractorToggleBtn = document.getElementById('protractor-toggle-btn');
   const protractorKnob = document.getElementById('protractor-knob');
-
   protractorToggleBtn.addEventListener('click', () => {
     isProtractorVisible = !isProtractorVisible;
-
-    // 控制 3D 对象可见性
     protractorL.visible = isProtractorVisible;
     protractorR.visible = isProtractorVisible;
-
-    // 更新 UI 状态
     if (isProtractorVisible) {
-      protractorToggleBtn.classList.remove('bg-slate-600');
-      protractorToggleBtn.classList.add('bg-blue-600');
+      protractorToggleBtn.classList.remove('bg-slate-600'); protractorToggleBtn.classList.add('bg-blue-600');
       protractorKnob.classList.remove('-translate-x-6');
     } else {
-      protractorToggleBtn.classList.remove('bg-blue-600');
-      protractorToggleBtn.classList.add('bg-slate-600');
+      protractorToggleBtn.classList.remove('bg-blue-600'); protractorToggleBtn.classList.add('bg-slate-600');
       protractorKnob.classList.add('-translate-x-6');
     }
   });
-
 
   function createArmSide(isLeft) {
     const pivotX = isLeft ? -6 : 6; const dir = isLeft ? 1 : -1;
@@ -689,10 +748,17 @@ T型通槽 31。
   }
   const armLeft = createArmSide(true);
   const armRight = createArmSide(false);
+  
   const boltGroup = new THREE.Group(); const boltGeo = new THREE.CylinderGeometry(0.15, 0.15, 1, 16); const boltMesh = new THREE.Mesh(boltGeo, boltMat); boltMesh.rotation.z = Math.PI / 2; boltMesh.userData = { type: 'Bolt' }; boltGroup.add(boltMesh);
   const handleGeo = new THREE.TorusGeometry(0.25, 0.05, 8, 16); const handle = new THREE.Mesh(handleGeo, boltMat); handle.position.y = 0.25; boltMesh.add(handle);
   scene.add(boltGroup);
-  const gridHelper = new THREE.GridHelper(50, 50, 0x1e293b, 0x0f172a); gridHelper.position.y = -2; scene.add(gridHelper);
+  
+  // Grid Helper with global reference
+  const gridHelper = new THREE.GridHelper(50, 50, 0x1e293b, 0x0f172a); 
+  gridHelper.position.y = -2; 
+  scene.add(gridHelper);
+  window.gridHelper = gridHelper; // 暴露给全局
+  
   const particleGeo = new THREE.BufferGeometry(); const particleCount = 200; const posArray = new Float32Array(particleCount * 3);
   for(let i=0; i<particleCount*3; i++) posArray[i] = (Math.random() - 0.5) * 30;
   particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
@@ -711,75 +777,36 @@ T型通槽 31。
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
 
-  // 修复后的点击事件处理函数
   function onMouseClick(event) {
-    // 如果点击的是UI元素，直接返回
     if(event.target.closest('.interactive')) return;
-
-    // 计算鼠标坐标
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
     raycaster.setFromCamera(mouse, camera);
-
-    // 【关键修复】检测目标同时包含 rulerGroup (尺子) 和 boltGroup (螺栓)
-    // 这样既能避免误触背景，又能正确检测到独立的螺栓对象
     const targets = [rulerGroup, boltGroup];
     const intersects = raycaster.intersectObjects(targets, true);
-
     if (intersects.length > 0) {
-      // 查找是否有带有 userData.type 的有效部件
       const obj = intersects.find(hit => hit.object.userData.type);
-
       if (obj) {
-        // 【鲁棒性修复】显式检查对象可见性，防止点击已隐藏的物体触发事件
-        if (!obj.object.visible) {
-          tooltip.classList.add('hidden');
-          unhighlightAll();
-          return;
-        }
-
-        // 【新增修复】检查是否点击了半圆片，但该部分处于隐藏状态
-        if (obj.object.userData.type === 'Protractor' && !isProtractorVisible) {
-           tooltip.classList.add('hidden');
-           unhighlightAll();
-           return;
-        }
-
+        if (!obj.object.visible) { tooltip.classList.add('hidden'); unhighlightAll(); return; }
+        if (obj.object.userData.type === 'Protractor' && !isProtractorVisible) { tooltip.classList.add('hidden'); unhighlightAll(); return; }
         showTooltip(obj.object, event.clientX, event.clientY);
         highlightPart(obj.object);
-      } else {
-        // 点到了尺子模型(如刻度线)，但不是有效部件
-        tooltip.classList.add('hidden');
-        unhighlightAll();
-      }
-    } else {
-      // 点击了真正的空白区域
-      tooltip.classList.add('hidden');
-      unhighlightAll();
-    }
+      } else { tooltip.classList.add('hidden'); unhighlightAll(); }
+    } else { tooltip.classList.add('hidden'); unhighlightAll(); }
   }
-
-  // 【鲁棒性优化】Tooltip 边界检测
+  
   function showTooltip(obj, x, y) { 
     const info = partsInfo[obj.userData.type]; 
     if(info) { 
       tooltipTitle.textContent = info.title; 
       tooltipDesc.textContent = info.desc; 
-      
-      // 简单的边界检测，防止 tooltip 溢出屏幕右侧
-      // 假设 tooltip 宽度约 200px + padding
       const tooltipWidth = 200; 
-      if (x + tooltipWidth/2 > window.innerWidth) {
-        x = window.innerWidth - tooltipWidth/2 - 10;
-      }
-      
+      if (x + tooltipWidth/2 > window.innerWidth) x = window.innerWidth - tooltipWidth/2 - 10;
       tooltip.style.left = x + 'px'; 
       tooltip.style.top = y + 'px'; 
       tooltip.classList.remove('hidden'); 
     } 
   }
-  
   let currentHighlight = null;
   function highlightPart(obj) { unhighlightAll(); if(obj.material.emissive) { obj.material.emissive.setHex(0x3b82f6); obj.material.emissiveIntensity = 0.5; currentHighlight = obj; } }
   function unhighlightAll() { if(currentHighlight) { currentHighlight.material.emissive.setHex(0x000000); currentHighlight = null; } }
@@ -798,24 +825,14 @@ T型通槽 31。
 
   window.switchTab = function(tabId) {
     state.currentTab = tabId;
-    
-    // 【鲁棒性修复】同时处理 Desktop 和 Mobile 的按钮状态
-    // 先重置所有按钮样式
     document.querySelectorAll('nav button').forEach(btn => { 
       btn.classList.remove('text-white', 'bg-white/10', 'text-blue-400'); 
       btn.classList.add('text-slate-300'); 
     });
-
-    // 高亮 Desktop 按钮
     const activeBtn = document.getElementById('btn-' + tabId); 
     if(activeBtn) { activeBtn.classList.add('text-white', 'bg-white/10'); activeBtn.classList.remove('text-slate-300'); }
-    
-    // 高亮 Mobile 按钮 (Mobile 按钮现在有 ID: btn-tabId-mobile)
     const activeMobileBtn = document.getElementById('btn-' + tabId + '-mobile');
-    if(activeMobileBtn) {
-      activeMobileBtn.classList.remove('text-slate-400');
-      activeMobileBtn.classList.add('text-blue-400');
-    }
+    if(activeMobileBtn) { activeMobileBtn.classList.remove('text-slate-400'); activeMobileBtn.classList.add('text-blue-400'); }
 
     const data = contentData[tabId]; const titleEl = document.getElementById('panel-title'); const contentEl = document.getElementById('panel-content');
     titleEl.innerHTML = `<span class="w-1 h-5 bg-blue-500 rounded-full"></span> ${data.title}`; let html = '';
@@ -842,9 +859,20 @@ T型通槽 31。
     renderer.render(scene, camera);
   }
   window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); updateControlHints(); });
+  
   window.onload = () => {
     updateControlHints();
-    setTimeout(() => { document.getElementById('loader').style.opacity = '0'; setTimeout(() => { document.getElementById('loader').style.display = 'none'; switchTab('measure'); }, 800); }, 1000); animate();
+    // 默认开启网格按钮高亮
+    document.getElementById('btn-grid')?.classList.add('active');
+    
+    setTimeout(() => { 
+        document.getElementById('loader').style.opacity = '0'; 
+        setTimeout(() => { 
+            document.getElementById('loader').style.display = 'none'; 
+            switchTab('measure'); 
+        }, 800); 
+    }, 1000); 
+    animate();
   };
 </script>
 </body>
