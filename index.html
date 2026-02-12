@@ -78,7 +78,7 @@
     .typing-indicator span { display: inline-block; width: 6px; height: 6px; background-color: #94a3b8; border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; margin: 0 2px; }
     @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
-    /* --- 新增样式：工具栏与主题 --- */
+    /* --- 工具栏与主题 --- */
     .tool-btn {
       width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
       border-radius: 6px; color: #94a3b8; transition: all 0.2s; background: transparent;
@@ -91,8 +91,27 @@
       background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(255,255,255,0.1);
       border-radius: 8px; padding: 8px; display: none; flex-direction: column; gap: 4px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100;
+      min-width: 160px; /* 确保菜单有最小宽度 */
     }
     .mobile-menu-panel.show { display: flex; }
+
+    /* --- 关键修复：移动端菜单按钮样式 --- */
+    .mobile-menu-panel .tool-btn {
+      width: 100%; /* 宽度撑满面板 */
+      height: auto; /* 高度自适应 */
+      padding: 10px 12px; /* 增加内边距 */
+      justify-content: flex-start; /* 内容左对齐 */
+      font-size: 14px; /* 文字大小 */
+      white-space: nowrap; /* 防止文字换行 */
+      gap: 10px; /* 图标和文字之间的间距 */
+    }
+    /* 修复图标在菜单中的样式 */
+    .mobile-menu-panel .tool-btn svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0; /* 防止图标被压缩 */
+      margin-right: 0; /* 清除之前的margin，用gap控制 */
+    }
 
     /* --- 关键修复：白色主题覆盖 --- */
     body.light-mode { background-color: #f1f5f9; color: #1e293b; }
@@ -104,26 +123,24 @@
     body.light-mode .mobile-menu-panel { background: rgba(255,255,255,0.95); }
     
     /* 文字颜色修正 */
-    body.light-mode .text-white { color: #0f172a !important; } /* 强制将白色文字改为深色 */
+    body.light-mode .text-white { color: #0f172a !important; }
     body.light-mode .text-slate-300 { color: #475569 !important; }
     body.light-mode .text-slate-400 { color: #64748b !important; }
-    body.light-mode .neon-text { text-shadow: 0 0 10px rgba(59, 130, 246, 0.2); } /* 减少发光强度 */
+    body.light-mode .neon-text { text-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
     
     /* 其他UI细节修正 */
     body.light-mode .bg-black\/40 { background-color: rgba(255, 255, 255, 0.6) !important; border-color: rgba(0,0,0,0.05) !important; }
     body.light-mode .bg-slate-900\/50 { background-color: rgba(241, 245, 249, 0.9) !important; }
     body.light-mode .chat-bubble.ai { background: #e2e8f0; color: #1e293b; border-color: #cbd5e1; }
     body.light-mode input { background: #e2e8f0 !important; color: #1e293b !important; border-color: #cbd5e1 !important; }
-    body.light-mode #panel-content h4 { color: #0f172a !important; } /* 步骤标题 */
+    body.light-mode #panel-content h4 { color: #0f172a !important; }
     body.light-mode .bg-blue-900\/50 { background-color: rgba(219, 234, 254, 0.5) !important; color: #1e40af !important; }
     body.light-mode .border-blue-800 { border-color: rgba(59, 130, 246, 0.3) !important; }
 
     /* --- 沉浸模式（全屏）优化 --- */
-    /* 全屏时隐藏：右侧面板、底部移动导航、控制提示 */
     body.immersive-mode #info-panel { opacity: 0; transform: translateX(100%); pointer-events: none; }
-    body.immersive-mode nav.md\:hidden { opacity: 0; pointer-events: none; } /* 隐藏底部移动导航 */
+    body.immersive-mode nav.md\:hidden { opacity: 0; pointer-events: none; }
     body.immersive-mode #control-hint { opacity: 0; }
-    /* 全屏时保留：Header 和 AI 助理按钮默认可见，无需额外CSS，因为它们不在隐藏列表中 */
   </style>
 </head>
 <body>
@@ -133,11 +150,13 @@
 <div class="ui-layer">
   <!-- Header (全屏时保留) -->
   <header class="w-full glass-panel border-b border-white/10 interactive py-3 px-3 md:px-6 flex justify-between items-center shrink-0 gap-2 md:gap-4">
-    <div class="flex items-center gap-3 shrink-0">
-      <div class="w-7 h-7 md:w-8 md:h-8 rounded bg-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.6)]">
+    
+    <!-- 左侧标题区：允许压缩 -->
+    <div class="flex items-center gap-2 md:gap-3 min-w-0">
+      <div class="w-7 h-7 md:w-8 md:h-8 rounded bg-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.6)] shrink-0">
         <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
       </div>
-      <div>
+      <div class="min-w-0">
         <h1 class="text-sm md:text-xl font-bold text-white tracking-wide neon-text leading-tight truncate">新型数学用绘图尺</h1>
         <p class="text-[10px] md:text-xs text-slate-400 hidden md:block">Interactive Tool Demo</p>
       </div>
@@ -151,8 +170,8 @@
       <button onclick="switchTab('arc')" id="btn-arc" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">绘制弧形</button>
     </nav>
 
-    <!-- 右侧工具区 -->
-    <div class="flex items-center gap-1 md:gap-2 relative">
+    <!-- 右侧工具区：防止压缩 -->
+    <div class="flex items-center gap-2 md:gap-2 relative shrink-0">
       
       <!-- 桌面端工具栏 -->
       <div class="hidden md:flex items-center gap-1 border-l pl-2 border-white/10">
@@ -164,7 +183,7 @@
       </div>
 
       <!-- 手机端工具菜单按钮 -->
-      <div class="flex md:hidden items-center">
+      <div class="flex md:hidden items-center shrink-0">
         <button onclick="toggleMobileMenu()" id="mobile-menu-btn" class="tool-btn" title="更多工具">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
         </button>
@@ -179,7 +198,7 @@
       </div>
 
       <!-- 半圆片开关 -->
-      <div class="flex items-center gap-2 md:border-l md:pl-4 md:border-white/10" title="显示/隐藏 半圆形片">
+      <div class="flex items-center gap-2 md:border-l md:pl-4 md:border-white/10 shrink-0" title="显示/隐藏 半圆形片">
         <span class="text-xs text-slate-400 hidden sm:inline">半圆片</span>
         <div id="protractor-toggle-btn" class="w-11 h-6 bg-blue-600 rounded-full relative cursor-pointer transition-colors duration-300 shadow-inner shrink-0">
           <div id="protractor-knob" class="w-4 h-4 bg-white rounded-full absolute top-1 right-1 transition-transform duration-300 shadow-sm pointer-events-none"></div>
