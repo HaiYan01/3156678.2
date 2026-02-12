@@ -30,7 +30,7 @@
       overflow: hidden;
       touch-action: none;
       transition: background-color 0.3s, color 0.3s;
-      /* 防止iOS橡皮筋效果 */
+      /* 彻底锁定 body，防止地址栏影响布局 */
       position: fixed;
       width: 100%;
       height: 100%;
@@ -69,10 +69,10 @@
 
     .canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 0; }
     
-    /* --- 关键修复：UI层使用Fixed定位，填满视口 --- */
+    /* --- 关键：UI层使用Fixed定位，填满视口 --- */
     .ui-layer { 
       position: fixed; 
-      top: 0; left: 0; right: 0; bottom: 0; /* inset: 0 */
+      top: 0; left: 0; right: 0; bottom: 0;
       z-index: 10; 
       pointer-events: none; 
       display: flex; 
@@ -145,7 +145,7 @@
     body.immersive-mode nav.md\:hidden { opacity: 0; pointer-events: none; }
     body.immersive-mode #control-hint { opacity: 0; }
 
-    /* --- 关键修复：沉浸模式下聊天窗口层级强制置顶 --- */
+    /* --- 沉浸模式下聊天窗口层级强制置顶 --- */
     body.immersive-mode #chat-container {
       z-index: 99999 !important; 
       pointer-events: auto !important;
@@ -160,7 +160,7 @@
 <div class="canvas-container" id="canvas-container"></div>
 
 <div class="ui-layer">
-  <!-- Header (全屏时保留) -->
+  <!-- Header -->
   <header class="w-full glass-panel border-b border-white/10 interactive py-3 px-3 md:px-6 flex justify-between items-center shrink-0 gap-2 md:gap-4">
     
     <!-- 左侧标题区 -->
@@ -174,7 +174,7 @@
       </div>
     </div>
 
-    <!-- 中间导航(桌面) -->
+    <!-- 中间导航 -->
     <nav class="hidden md:flex gap-2">
       <button onclick="switchTab('measure')" id="btn-measure" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">测量长度</button>
       <button onclick="switchTab('triangle')" id="btn-triangle" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-white/5 text-slate-300 hover:text-white">绘制三角形</button>
@@ -194,7 +194,7 @@
         <button onclick="takeScreenshot()" class="tool-btn" title="截图"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
       </div>
 
-      <!-- 手机端工具菜单按钮 -->
+      <!-- 手机端工具菜单 -->
       <div class="flex md:hidden items-center shrink-0">
         <button onclick="toggleMobileMenu()" id="mobile-menu-btn" class="tool-btn" title="更多工具">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
@@ -202,9 +202,6 @@
         <div id="mobile-menu-panel" class="mobile-menu-panel">
             <button onclick="toggleGrid(); toggleMobileMenu()" class="tool-btn w-full justify-start"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"></path></svg>网格开关</button>
             <button onclick="resetView(); toggleMobileMenu()" class="tool-btn w-full justify-start"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>重置视角</button>
-            <!--Fuke Xiaomi -->
-            <!--Fuke HUAWEI -->
-            <!--Fuke vivo -->
             <button onclick="toggleTheme(); toggleMobileMenu()" class="tool-btn w-full justify-start"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>切换主题</button>
             <button onclick="toggleFullscreen(); toggleMobileMenu()" class="tool-btn w-full justify-start"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>沉浸模式</button>
             <button onclick="takeScreenshot(); toggleMobileMenu()" class="tool-btn w-full justify-start"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>截图保存</button>
@@ -221,13 +218,12 @@
     </div>
   </header>
 
-  <!-- Mobile Nav (全屏时隐藏) -->
-  <!-- 修复：增加底部安全区域适配 (pb-[env(safe-area-inset-bottom)]) -->
-  <nav class="md:hidden flex justify-around glass-panel interactive fixed bottom-0 left-0 right-0 z-40 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-    <button id="btn-measure-mobile" onclick="switchTab('measure')" class="pt-2 pb-1 text-xs flex flex-col items-center text-blue-400 flex-1"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>测量</button>
-    <button id="btn-triangle-mobile" onclick="switchTab('triangle')" class="pt-2 pb-1 text-xs flex flex-col items-center text-slate-400 flex-1"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21l1.65-3.8a9 9 0 113.95 3.95L7.5 21L3 21z"></path></svg>三角形</button>
-    <button id="btn-polygon-mobile" onclick="switchTab('polygon')" class="pt-2 pb-1 text-xs flex flex-col items-center text-slate-400 flex-1"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>多边形</button>
-    <button id="btn-arc-mobile" onclick="switchTab('arc')" class="pt-2 pb-1 text-xs flex flex-col items-center text-slate-400 flex-1"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9 9 0 110-18 9 9 0 010 18z"></path></svg>弧形</button>
+  <!-- 修复：底部导航栏增加安全区域填充，而不是整体位移 -->
+  <nav class="md:hidden flex justify-around glass-panel interactive fixed bottom-0 left-0 right-0 z-40 py-2" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
+    <button id="btn-measure-mobile" onclick="switchTab('measure')" class="text-xs flex flex-col items-center text-blue-400 flex-1"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>测量</button>
+    <button id="btn-triangle-mobile" onclick="switchTab('triangle')" class="text-xs flex flex-col items-center text-slate-400 flex-1"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21l1.65-3.8a9 9 0 113.95 3.95L7.5 21L3 21z"></path></svg>三角形</button>
+    <button id="btn-polygon-mobile" onclick="switchTab('polygon')" class="text-xs flex flex-col items-center text-slate-400 flex-1"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>多边形</button>
+    <button id="btn-arc-mobile" onclick="switchTab('arc')" class="text-xs flex flex-col items-center text-slate-400 flex-1"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9 9 0 110-18 9 9 0 010 18z"></path></svg>弧形</button>
   </nav>
 
   <!-- Main Content Grid -->
@@ -237,15 +233,16 @@
         <h4 class="font-bold text-blue-400 mb-1" id="tooltip-title">部件名称</h4>
         <p id="tooltip-desc">描述内容...</p>
       </div>
-      <div id="control-hint" class="absolute bottom-20 md:bottom-6 left-6 pointer-events-none max-w-[80%] transition-opacity duration-500 opacity-100">
+      <!-- 提示文字位置上移 -->
+      <div id="control-hint" class="absolute bottom-24 md:bottom-6 left-6 pointer-events-none max-w-[80%] transition-opacity duration-500 opacity-100">
         <div class="text-slate-400 text-xs md:text-sm font-light bg-black/40 px-3 py-1.5 rounded backdrop-blur border border-white/5 inline-block">
           <span class="text-blue-400 font-bold">操作提示：</span> <span id="hint-text">加载中...</span>
         </div>
       </div>
     </div>
 
-    <!-- 修复：面板在移动端使用 max-h，防止过高遮挡导航 -->
-    <aside id="info-panel" class="w-full md:w-[480px] h-1/2 md:h-full glass-panel interactive flex flex-col border-l border-white/10 transition-transform duration-500 z-30 fixed bottom-0 left-0 right-0 md:relative md:bottom-auto">
+    <!-- 面板：固定在底部，增加底部填充避开导航栏 -->
+    <aside id="info-panel" class="w-full md:w-[480px] h-1/2 md:h-full glass-panel interactive flex flex-col border-l border-white/10 transition-transform duration-500 z-30 fixed bottom-0 left-0 right-0 md:relative md:bottom-auto" style="padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));">
       <div class="p-4 border-b border-white/10 flex justify-between items-center bg-black/20">
         <h2 id="panel-title" class="text-lg font-bold text-white flex items-center gap-2">
           <span class="w-1 h-5 bg-blue-500 rounded-full"></span>
@@ -254,7 +251,6 @@
         <button onclick="togglePanel()" id="panel-toggle-btn" class="text-slate-400 hover:text-white transition-transform duration-300" title="收起/展开面板">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
         </button>
-        <!-- 一只小龙被他爸爸揍了，因为他偷看成龙电影 -->
       </div>
       <div class="flex-1 overflow-y-auto p-5 space-y-6" id="panel-content">
         <!-- Dynamic Content -->
@@ -271,8 +267,8 @@
 </div>
 
 <!-- Chat Widget -->
-<!-- 修复：增加 bottom 值，避免被底部导航遮挡 -->
-<div id="chat-container" class="fixed z-[60] w-80 md:w-96 flex flex-col transition-all duration-300 transform translate-y-[120%] opacity-0 pointer-events-none interactive" style="bottom: calc(5rem + env(safe-area-inset-bottom)); right: 1.5rem;">
+<!-- 修复：动态计算底部距离，确保不被遮挡 -->
+<div id="chat-container" class="fixed z-[60] w-80 md:w-96 flex flex-col transition-all duration-300 transform translate-y-[120%] opacity-0 pointer-events-none interactive" style="bottom: calc(6rem + env(safe-area-inset-bottom)); right: 1.5rem;">
   <div class="glass-panel rounded-lg overflow-hidden flex flex-col h-[500px] shadow-2xl border border-blue-500/30">
     <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-3 flex justify-between items-center text-white">
       <div class="flex items-center gap-2">
@@ -301,8 +297,8 @@
   </div>
 </div>
 
-<!-- 修复：增加 bottom 值，避免被底部导航遮挡 -->
-<button onclick="toggleChat()" id="chat-toggle-btn" class="fixed z-[60] w-14 h-14 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full shadow-lg flex items-center justify-center text-white hover:scale-110 transition-transform duration-200 border border-white/20" style="bottom: calc(5rem + env(safe-area-inset-bottom)); right: 1.5rem;">
+<!-- 修复：动态计算底部距离 -->
+<button onclick="toggleChat()" id="chat-toggle-btn" class="fixed z-[60] w-14 h-14 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full shadow-lg flex items-center justify-center text-white hover:scale-110 transition-transform duration-200 border border-white/20" style="bottom: calc(6rem + env(safe-area-inset-bottom)); right: 1.5rem;">
   <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
 </button>
 
@@ -336,7 +332,16 @@
 螺纹孔中围绕半圆形片的圆心绘制弧形，由于副尺在缺槽内滑动，配合限位
 块和限位槽的设置，能够控制弧形的半径，进一步提高数学用绘图尺的实用
 性。
-... (此处省略其余文档内容以节省篇幅，实际代码中请保留完整文档) ...
+
+【权利要求书】
+1.一种新型数学用绘图尺，其特征在于，包括：
+直尺（1），所述直尺（1）一侧面的两端均固定安装有半圆形片（11）；
+主尺（2），所述主尺（2）的一端与半圆形片（11）的圆心位置转动连
+接；
+副尺（3），所述副尺（3）滑动安装在主尺（2）的一侧面；
+手拧螺栓（4），所述手拧螺栓（4）与两个所述副尺（3）的另一端螺纹
+连接。
+... (此处省略其余文档内容以节省篇幅) ...
 客服的联系方式是zn_1018@qq.com，如果用户询问客服的联系方式，或者你认为这个问题需要联系客服，就让用户联系这个Email
 `;
 
@@ -750,7 +755,6 @@
   window.onload = () => {
     updateControlHints();
     document.getElementById('btn-grid')?.classList.add('active');
-    
     setTimeout(() => { 
         document.getElementById('loader').style.opacity = '0'; 
         setTimeout(() => { 
@@ -763,4 +767,3 @@
 </script>
 </body>
 </html>
-
